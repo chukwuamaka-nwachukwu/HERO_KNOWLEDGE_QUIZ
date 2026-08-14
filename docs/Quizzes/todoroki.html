@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Shoto Todoroki</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --ice: #3498db;
+      --fire: #e74c3c;
+      --glass: rgba(5, 5, 10, 0.9);
+      --border: rgba(255, 255, 255, 0.15);
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: #000; font-family: 'Inter', sans-serif;
+      color: white; overflow: hidden;
+    }
+
+    /* Split Background Effect */
+    body::before {
+      content: ""; position: fixed; top: 0; left: 0; width: 50%; height: 100%;
+      background: linear-gradient(to right, rgba(52, 152, 219, 0.15), transparent);
+      z-index: 0;
+    }
+    body::after {
+      content: ""; position: fixed; top: 0; right: 0; width: 50%; height: 100%;
+      background: linear-gradient(to left, rgba(231, 76, 60, 0.15), transparent);
+      z-index: 0;
+    }
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.4) saturate(1.2); }
+    .overlay { position: fixed; inset: 0; background: radial-gradient(circle, rgba(20,20,20,0.70) 0%, rgba(5,5,5,0.85) 100%); z-index: 2; }
+
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 6px; z-index: 10; background: rgba(255,255,255,0.05); }
+    #progressBar { 
+      height: 100%; width: 0%; 
+      background: linear-gradient(90deg, var(--ice), var(--fire)); 
+      box-shadow: 0 0 20px var(--fire);
+      transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+    }
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    
+    .circle-btn {
+      width: 45px; height: 45px; border-radius: 50%; background: white; color: #000;
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 18px;
+    }
+    .circle-btn:hover { transform: scale(1.1); background: var(--ice); color: white; box-shadow: 0 0 15px var(--ice); }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--border);
+      width: 95%; max-width: 650px; border-radius: 24px; padding: 45px; text-align: center;
+      box-shadow: -15px 0 40px rgba(52, 152, 219, 0.1), 15px 0 40px rgba(231, 76, 60, 0.1);
+      border-bottom: 4px solid var(--fire);
+    }
+
+    #questionText { font-size: 22px; font-weight: 500; margin-bottom: 30px; letter-spacing: 0.5px; line-height: 1.4; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border);
+      padding: 18px; border-radius: 12px; color: white; cursor: pointer; transition: 0.3s; 
+      font-size: 15px; letter-spacing: 1px;
+    }
+    .option-btn:hover { border-color: var(--ice); background: rgba(52, 152, 219, 0.1); transform: translateY(-2px); }
+    .option-btn.selected { background: linear-gradient(90deg, var(--ice), var(--fire)) !important; color: white !important; font-weight: bold; border: none; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3); }
+    .option-btn.hidden { opacity: 0; pointer-events: none; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+    
+    .nav-btn {
+      background: none; border: 1px solid #444; color: #999;
+      padding: 10px 25px; border-radius: 8px; cursor: pointer; transition: 0.3s;
+      font-weight: bold; font-size: 12px; text-transform: uppercase;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: white; color: white; }
+    .nav-btn:disabled { opacity: 0.2; }
+
+    .lifeline-btn { 
+        background: transparent; border: 1px solid #555; padding: 10px 20px; 
+        color: #777; cursor: pointer; font-size: 11px;
+        border-radius: 4px; font-weight: bold; text-transform: uppercase;
+    }
+    .lifeline-btn:hover:not(:disabled) { color: white; border-color: white; }
+
+    #start-screen {
+      position: fixed; inset: 0; background: #000; color: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
+    }
+    #start-screen h1 { font-size: 50px; margin: 0; letter-spacing: 10px; font-weight: 800; text-transform: uppercase; }
+    #start-screen p { color: var(--ice); letter-spacing: 4px; font-size: 14px; margin-top: 10px; margin-bottom: 40px; }
+
+    #start-btn {
+      padding: 18px 70px; background: linear-gradient(90deg, var(--ice), var(--fire));
+      border: none; border-radius: 50px; color: white; font-size: 18px; font-weight: bold;
+      cursor: pointer; transition: 0.4s; letter-spacing: 2px;
+    }
+    #start-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(231, 76, 60, 0.4); }
+
+    .review-area { max-height: 200px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid #222; }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>SHOTO</h1>
+    <p>HARMONY OF ICE AND FIRE</p>
+    <label style="margin-bottom: 30px; cursor: pointer; opacity: 0.7;"><input type="checkbox" id="enable-sound"> CALIBRATE AUDIO CORE</label>
+    <button id="start-btn">BEGIN ASSESSMENT</button>
+  </div>
+
+  <audio id="myAudio" loop><source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" /></audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/todoroki_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="color: var(--ice); font-weight: bold; font-size: 11px; margin-bottom: 12px; letter-spacing: 3px;">
+          ANALYSIS: <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">Initializing...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">BACK</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">THERMAL BALANCE</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--fire);">0/10</h1>
+        <p id="remarkText" style="color: #888; letter-spacing: 1px; font-weight: bold;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; background: white; color: black; font-weight: bold;" onclick="location.reload()">RE-ATTEMPT ASSESSMENT</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audio = document.getElementById("myAudio");
+    document.getElementById("start-btn").addEventListener("click", () => {
+        document.getElementById("start-screen").style.display = "none";
+        if (document.getElementById("enable-sound").checked) {
+            audio.currentTime = 125; audio.play();
+        }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is the name of Shoto's Quirk?", a: "Half-Cold Half-Hot", o: ["Half-Cold Half-Hot", "Frostfire", "Thermal Dualism", "Ice & Flame"] },
+        { q: "Which side of Shoto's body generates fire?", a: "Left", o: ["Left", "Right", "Upper", "Lower"] },
+        { q: "What is Shoto's favorite food?", a: "Cold Soba", o: ["Hot Ramen", "Cold Soba", "Mochi", "Spicy Curry"] },
+        { q: "What is Shoto's Hero Name?", a: "Shoto", o: ["Shoto", "Five Weenie", "Icy-Hot", "The Dual Hero"] },
+        { q: "Who is Shoto's father?", a: "Enji Todoroki", o: ["Toshinori Yagi", "Enji Todoroki", "Taishiro Toyomitsu", "Keigo Takami"] },
+        { q: "What rank did Shoto achieve in the U.A. Sports Festival?", a: "2nd", o: ["1st", "2nd", "3rd", "4th"] },
+        { q: "What is Shoto's mother's name?", a: "Rei", o: ["Mitsuki", "Inko", "Rei", "Fuyumi"] },
+        { q: "Shoto entered U.A. through which method?", a: "Official Recommendation", o: ["Entrance Exam", "Official Recommendation", "Transfer", "Legacy Admission"] },
+        { q: "Who is Shoto's eldest brother?", a: "Toyo (Dabi)", o: ["Natsuo", "Toyo (Dabi)", "Tenya", "Keigo"] },
+        { q: "What is Shoto's seat number in Class 1-A?", a: "15", o: ["1", "5", "15", "20"] },
+        { q: "What is Shoto's birthday?", a: "January 11th", o: ["January 11th", "July 15th", "April 20th", "December 25th"] },
+        { q: "During the Hero Killer arc, who did Shoto intern with?", a: "Endeavor", o: ["Best Jeanist", "Endeavor", "Gran Torino", "Manual"] },
+        { q: "What move uses both sides simultaneously to create 'Cold Flames'?", a: "Phosphor", o: ["Heaven-Piercing Ice Wall", "Phosphor", "Prominence Burn", "Glacier Smash"] },
+        { q: "What color is Shoto's hair on his ice-producing side?", a: "White", o: ["Red", "White", "Grey", "Blue"] },
+        { q: "What is Shoto's blood type?", a: "O", o: ["A", "B", "O", "AB"] },
+        { q: "What is the name of Shoto's sister?", a: "Fuyumi", o: ["Fuyumi", "Mina", "Eri", "Nemuri"] },
+        { q: "In the Provisional Hero License Exam, who did Shoto conflict with?", a: "Inasa Yoarashi", o: ["Bakugo", "Inasa Yoarashi", "Seiji Shishikura", "Camie Utsushimi"] },
+        { q: "What item did Shoto's mother use that caused his scar?", a: "Boiling water", o: ["A hot iron", "Boiling water", "A fire quirk", "A chemical burn"] },
+        { q: "Who does Shoto consider his first real friend at U.A.?", a: "Izuku Midoriya", o: ["Katsuki Bakugo", "Tenya Iida", "Izuku Midoriya", "Momo Yaoyorozu"] },
+        { q: "What is Shoto's height?", a: "176 cm", o: ["170 cm", "176 cm", "180 cm", "185 cm"] }
+    ];
+
+    let highScore = localStorage.getItem("shoto_high_score") || 0;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "FINISH EXAM" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { showResults(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let removed = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && removed < 2) {
+                b.classList.add("hidden");
+                removed++;
+            }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function showResults() {
+        let score = 0;
+        const review = document.getElementById("reviewList");
+        review.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            review.innerHTML += `<div style="margin-bottom:10px; border-left:4px solid ${isCorrect ? 'var(--ice)' : 'var(--fire)'}; padding-left:10px;">
+                <div style="font-size:13px; font-weight:bold;">${q.q}</div>
+                <div style="font-size:11px; color:${isCorrect ? 'var(--ice)' : 'var(--fire)'}">DATA: ${q.a}</div>
+            </div>`;
+        });
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("shoto_high_score", highScore);
+        }
+
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerHTML = `${score}/10 <span style="font-size:16px; color:white; display:block;">PEAK RECORD: ${highScore}/10</span>`;
+        document.getElementById("remarkText").innerText = score > 7 ? "RATIONAL RESULTS. WELL DONE." : "INSUFFICIENT BALANCE. DO BETTER.";
+    }
+  </script>
+</body>
+</html>

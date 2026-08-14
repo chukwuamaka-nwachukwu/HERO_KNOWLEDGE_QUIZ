@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Tenya Iida</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #000080; /* Navy Blue */
+      --accent: #bdc3c7;  /* Chrome Silver */
+      --danger: #e74c3c;  /* Heat Red */
+      --glass: rgba(10, 20, 40, 0.95);
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: #050510; font-family: 'Inter', sans-serif;
+      color: white; overflow: hidden;
+    }
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: contrast(1.1) brightness(0.5); }
+    .overlay { position: fixed; inset: 0; background: linear-gradient(circle, rgba(20,20,20,0.4) 0%, rgba(5,5,5,0.95) 100%); z-index: 2; }
+
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 10px; z-index: 10; background: #111; border-bottom: 2px solid var(--accent); }
+    #progressBar { 
+      height: 100%; width: 0%; 
+      background: linear-gradient(90deg, var(--primary), #3498db, var(--danger)); 
+      transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1); 
+      box-shadow: 0 0 15px var(--danger);
+    }
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    
+    .circle-btn {
+      width: 50px; height: 50px; border-radius: 4px; background: var(--accent); color: var(--primary);
+      border: 2px solid var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.2s; font-size: 20px; font-weight: bold; transform: skewX(-15deg);
+    }
+    .circle-btn:hover { background: white; transform: skewX(-15deg) scale(1.1); box-shadow: 0 0 15px white; }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); border: 3px solid var(--accent);
+      width: 90%; max-width: 650px; border-radius: 0px 50px 0px 50px; padding: 45px; text-align: left;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8); position: relative;
+    }
+
+    /* Exhaust Pipe Decals */
+    .quiz-card::before { content: ""; position: absolute; top: -15px; right: 40px; width: 60px; height: 30px; background: var(--accent); clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); opacity: 0.5; }
+
+    #questionText { font-size: 22px; font-weight: 700; margin-bottom: 30px; border-left: 5px solid var(--danger); padding-left: 20px; text-transform: uppercase; letter-spacing: 1px; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: rgba(189, 195, 199, 0.05); border: 1px solid var(--accent);
+      padding: 18px; color: var(--accent); cursor: pointer; transition: 0.3s; 
+      font-weight: 800; text-transform: uppercase; clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
+    }
+    .option-btn:hover { background: var(--accent); color: var(--primary); }
+    .option-btn.selected { background: var(--primary) !important; color: white !important; border-left: 8px solid var(--danger); box-shadow: 0 0 20px var(--primary); }
+    .option-btn.hidden { opacity: 0; pointer-events: none; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; border-top: 2px solid #222; padding-top: 25px; }
+    
+    .nav-btn {
+      background: var(--accent); border: none; color: var(--primary);
+      padding: 12px 35px; font-weight: 900; cursor: pointer; 
+      clip-path: polygon(15% 0, 100% 0, 85% 100%, 0% 100%); transition: 0.3s;
+    }
+    .nav-btn:hover:not(:disabled) { background: white; transform: scale(1.05); }
+    .nav-btn:disabled { opacity: 0.1; cursor: not-allowed; }
+
+    .lifeline-btn { 
+        background: transparent; border: 2px solid var(--danger); padding: 8px 15px; 
+        color: var(--danger); cursor: pointer; font-size: 11px; font-weight: 900; text-transform: uppercase;
+    }
+    .lifeline-btn:hover:not(:disabled) { background: var(--danger); color: white; }
+
+    #start-screen {
+      position: fixed; inset: 0; background: #000; color: #fff; 
+      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
+    }
+    #start-screen h1 { font-size: 5rem; font-style: italic; font-weight: 900; letter-spacing: -2px; margin: 0; color: var(--accent); }
+    #start-screen p { color: var(--danger); letter-spacing: 5px; font-weight: bold; }
+
+    #start-btn {
+      margin-top: 40px; padding: 18px 80px; background: var(--primary); color: white;
+      border: 2px solid var(--accent); font-size: 22px; font-weight: 900; cursor: pointer; transform: skewX(-20deg);
+    }
+    #start-btn:hover { background: white; color: var(--primary); box-shadow: 0 0 30px var(--primary); }
+
+    .review-area { max-height: 220px; overflow-y: auto; background: rgba(0,0,0,0.6); padding: 20px; border: 1px solid #333; }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>INGENIUM</h1>
+    <p>UA REPRESENTATIVE PORTAL</p>
+    <label style="margin-top: 20px; cursor: pointer; opacity: 0.7; font-size: 12px;">
+      <input type="checkbox" id="enable-sound"> CALIBRATE AUDIO SYNC
+    </label>
+    <button id="start-btn">START EXAM</button>
+  </div>
+
+  <audio id="myAudio" loop><source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" /></audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/tenya_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="font-size: 11px; font-weight: 900; color: var(--danger); letter-spacing: 3px; margin-bottom: 10px;">
+          UA PROTOCOL: SECTION <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">Initializing Systems...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">PREV</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">RECIPRO BURST (50/50)</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none; text-align: center;">
+        <h1 id="scoreDisplay" style="font-size: 90px; margin: 0; color: var(--accent);">0/10</h1>
+        <p style="letter-spacing: 4px; font-weight: bold; color: var(--danger);" id="remarkText">ANALYZING PERFORMANCE...</p>
+        <div id="reviewList" class="review-area"></div>
+        <button class="nav-btn" style="width:100%; margin-top:20px; clip-path: none;" onclick="location.reload()">RE-ATTEMPT EXAM</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audio = document.getElementById("myAudio");
+    document.getElementById("start-btn").addEventListener("click", () => {
+        document.getElementById("start-screen").style.display = "none";
+        if(document.getElementById("enable-sound").checked) {
+            audio.currentTime = 125; audio.play();
+        }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is Tenya Iida's Quirk?", a: "Engine", o: ["Speed Force", "Engine", "Muffler", "Turbine"] },
+        { q: "Where are Iida's engines located?", a: "Calves", o: ["Calves", "Elbows", "Back", "Thighs"] },
+        { q: "What is the name of Iida's older brother?", a: "Tensei", o: ["Tenya", "Tensei", "Togata", "Toshio"] },
+        { q: "What is Iida's Hero Name?", a: "Ingenium", o: ["Ingenium", "Turbo Runner", "Recipro", "Sonic Hero"] },
+        { q: "What fuel does Iida prefer for his engines?", a: "Orange Juice", o: ["Water", "Orange Juice", "Soda", "Milk"] },
+        { q: "What happens if he drinks carbonated drinks?", a: "They stall", o: ["They stall", "They go faster", "They smoke", "They explode"] },
+        { q: "What is Iida's role in Class 1-A?", a: "Class Representative", o: ["Class Representative", "Vice President", "Treasurer", "Secretary"] },
+        { q: "What is Iida's birthday?", a: "August 22nd", o: ["August 22nd", "May 10th", "December 25th", "July 4th"] },
+        { q: "Which ultimate move lasts for 10 minutes?", a: "Recipro Turbo", o: ["Recipro Burst", "Recipro Turbo", "Recipro Extend", "Engine Overdrive"] },
+        { q: "In the Hero Killer arc, which city did Iida go to for revenge?", a: "Hosu City", o: ["Hosu City", "Musutafu", "Kamino", "Deika City"] },
+        { q: "What is Iida's blood type?", a: "A", o: ["A", "B", "O", "AB"] },
+        { q: "What is Iida's height?", a: "179 cm", o: ["170 cm", "175 cm", "179 cm", "185 cm"] },
+        { q: "Which student did Iida lose to in the Sports Festival semifinals?", a: "Shoto Todoroki", o: ["Bakugo", "Midoriya", "Shoto Todoroki", "Tokoyami"] },
+        { q: "What is the name of the Hero Agency his family runs?", a: "Idaten", o: ["Ingenium Agency", "Idaten", "Speedsters Inc", "Engine Force"] },
+        { q: "What does Iida do to permanently improve his Quirk?", a: "Muffler Pulling", o: ["Exhaust Cleaning", "Turbo Upgrading", "Muffler Pulling", "Recipro Cooling"] },
+        { q: "Who did Iida intern with after the Sports Festival?", a: "Manual", o: ["Manual", "Endeavor", "Gunhead", "Best Jeanist"] },
+        { q: "What is Iida's favorite food?", a: "Beef Stew", o: ["Ramen", "Beef Stew", "Curry", "Sushi"] },
+        { q: "What is his seat number in Class 1-A?", a: "4", o: ["1", "4", "10", "15"] },
+        { q: "His engines have three speeds. What are they called?", a: "Gears", o: ["Levels", "Modes", "Gears", "Stages"] },
+        { q: "Iida's academic ranking in the Midterms was?", a: "2nd", o: ["1st", "2nd", "4th", "5th"] }
+    ];
+
+    let highScore = localStorage.getItem("iida_high_score") || 0;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "DECODE RESULTS" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { finish(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let count = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && count < 2) { b.classList.add("hidden"); count++; }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function finish() {
+        let score = 0;
+        const review = document.getElementById("reviewList");
+        review.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            review.innerHTML += `<div style="margin-bottom:10px; border-left:3px solid ${isCorrect ? 'var(--primary)' : 'var(--danger)'}; padding-left:10px;">
+                <div style="font-size:13px; font-weight:bold;">${q.q}</div>
+                <div style="font-size:11px; color:${isCorrect ? '#4caf50' : 'var(--danger)'}">LOG: ${q.a}</div>
+            </div>`;
+        });
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("iida_high_score", highScore);
+        }
+
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerText = score + "/10";
+        document.getElementById("remarkText").innerText = score > 7 ? "TOP TIER PERFORMANCE!" : "RE-EVALUATION REQUIRED!";
+    }
+  </script>
+</body>
+</html>

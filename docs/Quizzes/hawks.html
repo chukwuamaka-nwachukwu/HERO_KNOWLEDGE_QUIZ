@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Hawks</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #ffd700; /* Feather Gold */
+      --secondary: #87ceeb; /* Sky Blue */
+      --accent: #b22222; /* Wing Crimson */
+      --glass: rgba(0, 0, 0, 0.75);
+      --border: rgba(255, 215, 0, 0.3);
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: #050505; font-family: 'Inter', sans-serif;
+      color: white; overflow: hidden;
+    }
+
+    /* High Altitude Wind Effect Overlay */
+    body::after {
+      content: ""; position: fixed; inset: 0;
+      background: linear-gradient(to bottom, transparent, rgba(135, 206, 235, 0.05));
+      pointer-events: none; z-index: 3;
+    }
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.4); }
+    .overlay { position: fixed; inset: 0; background: radial-gradient(circle, rgba(20,20,20,0.8) 0%, rgba(5,5,5,0.95) 100%); z-index: 2; }
+
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 5px; z-index: 10; background: rgba(255,255,255,0.05); }
+    #progressBar { height: 100%; width: 0%; background: var(--primary); box-shadow: 0 0 20px var(--primary); transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    
+    .circle-btn {
+      width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.1); color: white;
+      border: 1px solid rgba(255,255,255,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 18px; backdrop-filter: blur(10px);
+    }
+    .circle-btn:hover { background: var(--primary); color: #000; transform: scale(1.1); border-color: var(--primary); }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); backdrop-filter: blur(30px); border: 1px solid var(--border);
+      width: 90%; max-width: 600px; border-radius: 24px; padding: 45px; text-align: center;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+
+    #questionText { font-size: 20px; font-weight: 400; line-height: 1.5; margin-bottom: 30px; letter-spacing: 0.5px; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.1);
+      padding: 16px; border-radius: 12px; color: #ccc; cursor: pointer; transition: 0.2s; font-size: 15px;
+    }
+    .option-btn:hover { border-color: var(--primary); color: white; background: rgba(255, 215, 0, 0.05); }
+    .option-btn.selected { background: var(--primary) !important; color: #000 !important; font-weight: 700; border-color: var(--primary); }
+    .option-btn.hidden { opacity: 0; pointer-events: none; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+    
+    .nav-btn {
+      background: none; border: 1px solid #444; color: #888; padding: 10px 25px; 
+      border-radius: 50px; cursor: pointer; transition: 0.3s; font-size: 12px; font-weight: bold; letter-spacing: 1px;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+    .nav-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+    .lifeline-btn { 
+        background: var(--accent); border: none; padding: 10px 20px; 
+        border-radius: 50px; color: white; cursor: pointer; font-size: 11px; font-weight: 900; letter-spacing: 1px;
+    }
+
+    #start-screen {
+      position: fixed; inset: 0; background: #000; color: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
+    }
+    #start-screen h1 { font-size: 50px; letter-spacing: 15px; color: var(--primary); margin: 0; text-shadow: 0 0 20px rgba(255,215,0,0.3); }
+    #start-screen p { opacity: 0.5; font-size: 12px; letter-spacing: 5px; margin-bottom: 40px; }
+
+    #start-btn {
+      padding: 18px 60px; background: var(--primary); border: none;
+      border-radius: 4px; font-size: 18px; color: #000; font-weight: bold; cursor: pointer; transition: 0.3s;
+    }
+    #start-btn:hover { letter-spacing: 2px; box-shadow: 0 0 30px var(--primary); }
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+    .review-area { max-height: 220px; overflow-y: auto; text-align: left; padding: 20px; border-radius: 12px; background: rgba(0,0,0,0.3); }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>HAWKS</h1>
+    <p>TOP SECRET / HPSC CLASSIFIED</p>
+    <label style="margin-bottom: 30px; cursor: pointer; font-size: 11px; opacity: 0.7;">
+        <input type="checkbox" id="enable-sound"> INITIALIZE AUDIO SURVEILLANCE
+    </label>
+    <button id="start-btn">TAKEOFF</button>
+  </div>
+
+  <audio id="myAudio" loop>
+    <source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" />
+  </audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/hawks_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="color: var(--primary); font-size: 11px; margin-bottom: 10px; letter-spacing: 2px; font-weight: 800;">
+          FLIGHT PATH: <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">Calibrating feathers...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">BACK</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">VIBRATION SENSE (50/50)</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--primary);">0/10</h1>
+        <p id="remarkText" style="margin-bottom: 20px; font-weight: bold;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; margin-top:20px; border-color: var(--primary); color: var(--primary);" onclick="location.reload()">RE-INITIATE MISSION</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    const startBtn = document.getElementById("start-btn");
+    const audio = document.getElementById("myAudio");
+
+    startBtn.addEventListener("click", () => {
+        document.getElementById("start-screen").style.display = "none";
+        if (document.getElementById("enable-sound").checked) {
+            audio.currentTime = 125; audio.play();
+        }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is Hawks' real name?", a: "Keigo Takami", o: ["Keigo Takami", "Enji Todoroki", "Jin Bubaigawara", "Taishiro Toyomitsu"] },
+        { q: "What is the name of Hawks' Quirk?", a: "Fierce Wings", o: ["Eagle Eye", "Fierce Wings", "Feather Control", "Golden Flight"] },
+        { q: "Hawks is known as the hero who is '_____'.", a: "Too fast for his own good", o: ["Always on time", "Too fast for his own good", "The master of feathers", "Fearless in flight"] },
+        { q: "What is Hawks' official rank on the Hero Billboard Chart JP?", a: "No. 2", o: ["No. 1", "No. 2", "No. 3", "No. 4"] },
+        { q: "Who was Hawks' childhood idol that inspired him?", a: "Endeavor", o: ["All Might", "Endeavor", "Best Jeanist", "Crimson Riot"] },
+        { q: "What happens when Hawks uses all the feathers on his wings?", a: "They take time to grow back", o: ["He loses his sight", "They take time to grow back", "He falls into a coma", "He becomes Quirkless"] },
+        { q: "Hawks went undercover to infiltrate which organization?", a: "The Paranormal Liberation Front", o: ["The Shie Hassaikai", "The Meta Liberation Army", "The Paranormal Liberation Front", "The League of Villains"] },
+        { q: "What is Hawks' favorite food?", a: "Chicken", o: ["Chicken", "Sushi", "Ramen", "Beef"] },
+        { q: "Which organization raised and trained Hawks from a young age?", a: "Hero Public Safety Commission", o: ["U.A. High School", "Hero Public Safety Commission", "The Meta Army", "Police Force"] },
+        { q: "What is Hawks' birthday?", a: "December 28th", o: ["December 28th", "January 1st", "July 4th", "November 11th"] },
+        { q: "What is the primary color of Hawks' visor?", a: "Yellow", o: ["Red", "Blue", "Yellow", "Orange"] },
+        { q: "Hawks can sense _____ through his feathers.", a: "Vibrations", o: ["Heartbeats", "Heat", "Vibrations", "Lies"] },
+        { q: "Which villain did Hawks famously kill during the War Arc?", a: "Twice", o: ["Dabi", "Twice", "Mr. Compress", "Spinner"] },
+        { q: "What is the name of Hawks' Hero Agency location?", a: "Fukuoka", o: ["Tokyo", "Fukuoka", "Kyoto", "Osaka"] },
+        { q: "How old was Hawks when he made the top 10 list?", a: "18", o: ["15", "18", "22", "25"] },
+        { q: "What book did Hawks use to send coded messages to Endeavor?", a: "Meta Liberation War", o: ["Meta Liberation War", "The Book of Heroes", "The Art of War", "Silence of the Lambs"] },
+        { q: "Hawks' father was a ____.", a: "Villain", o: ["Hero", "Villain", "Police Officer", "Doctor"] },
+        { q: "What is the name of Hawks' signature feather-sword move?", a: "Feather Blade", o: ["Wing Slash", "Feather Blade", "Golden Strike", "Aerial Edge"] },
+        { q: "At what age did Keigo Takami save people from a high-speed car accident?", a: "A small child", o: ["15 years old", "A small child", "18 years old", "12 years old"] },
+        { q: "What is Hawks' ultimate goal for society?", a: "A world where heroes have too much time", o: ["To be Number 1", "A world where heroes have too much time", "To eradicate all villains", "To lead the HPSC"] }
+    ];
+
+    let highScore = localStorage.getItem("hawks_high_score") || 0;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "FINALIZE" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { calculateResults(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let count = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && count < 2) { b.classList.add("hidden"); count++; }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function calculateResults() {
+        let score = 0;
+        const review = document.getElementById("reviewList");
+        review.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            review.innerHTML += `<div style="margin-bottom:12px; border-left:3px solid ${isCorrect ? 'var(--primary)' : 'var(--accent)'}; padding-left:15px;">
+                <div style="font-size:13px;">${q.q}</div>
+                <div style="font-size:11px; color:var(--primary)">Intel: ${q.a}</div>
+            </div>`;
+        });
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("hawks_high_score", highScore);
+        }
+
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerHTML = score + "/10 <div style='font-size:14px; color:white;'>RECORD: " + highScore + "/10</div>";
+        document.getElementById("remarkText").innerText = score > 7 ? "TOP TIER SPEED!" : "STILL TOO SLOW...";
+    }
+</script>
+</body>
+</html>

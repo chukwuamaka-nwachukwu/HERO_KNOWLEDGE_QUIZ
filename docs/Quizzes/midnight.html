@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Midnight</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #9b59b6; /* Royal Purple */
+      --secondary: #2c3e50; /* Midnight Blue */
+      --accent: #f1c40f; /* Hero Gold */
+      --glass: rgba(20, 0, 30, 0.85);
+      --border: rgba(155, 89, 182, 0.5);
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: #0d0216; font-family: 'Inter', sans-serif;
+      color: white; overflow: hidden;
+    }
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.5) sepia(0.2) hue-rotate(260deg); }
+    .overlay { position: fixed; inset: 0; background: radial-gradient(circle, rgba(20,20,20,0.7) 0%, rgba(5,5,5,0.95) 100%); z-index: 2; }
+
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 6px; z-index: 10; background: rgba(0,0,0,0.5); }
+    #progressBar { 
+      height: 100%; width: 0%; 
+      background: linear-gradient(90deg, var(--primary), #e056fd); 
+      box-shadow: 0 0 20px var(--primary);
+      transition: 0.8s ease-in-out; 
+    }
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    
+    .circle-btn {
+      width: 45px; height: 45px; border-radius: 50%; background: white; color: #0d0216;
+      border: 2px solid var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 18px;
+    }
+    .circle-btn:hover { transform: rotate(90deg); background: var(--primary); color: white; box-shadow: 0 0 15px var(--primary); }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--border);
+      width: 90%; max-width: 620px; border-radius: 50px 5px 50px 5px; padding: 45px; text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.7), inset 0 0 20px rgba(155, 89, 182, 0.2);
+    }
+
+    #questionText { font-size: 22px; font-weight: 600; font-style: italic; color: #f8f8f8; margin-bottom: 30px; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(155, 89, 182, 0.3);
+      padding: 18px; border-radius: 30px; color: white; cursor: pointer; transition: 0.3s; 
+      font-size: 15px; border-bottom: 3px solid var(--border);
+    }
+    .option-btn:hover { background: rgba(155, 89, 182, 0.2); border-color: var(--primary); transform: translateY(-2px); }
+    .option-btn.selected { background: var(--primary) !important; color: white !important; font-weight: bold; border-color: white; }
+    .option-btn.hidden { opacity: 0; pointer-events: none; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+    
+    .nav-btn {
+      background: none; border: 1.5px solid var(--primary); color: var(--primary);
+      padding: 10px 25px; border-radius: 20px; cursor: pointer; transition: 0.3s;
+      font-weight: 600; text-transform: uppercase;
+    }
+    .nav-btn:hover:not(:disabled) { background: var(--primary); color: white; }
+    .nav-btn:disabled { opacity: 0.2; }
+
+    .lifeline-btn { 
+        background: none; border: 1px solid var(--accent); padding: 10px 20px; 
+        border-radius: 20px; color: var(--accent); cursor: pointer; font-size: 12px;
+        font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .lifeline-btn:hover:not(:disabled) { background: var(--accent); color: black; }
+
+    #start-screen {
+      position: fixed; inset: 0; background: #0d0216; color: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
+    }
+    #start-screen h1 { font-family: 'Georgia', serif; font-size: 60px; margin: 0; color: var(--primary); text-shadow: 0 0 20px rgba(155,89,182,0.5); }
+
+    #start-btn {
+      padding: 18px 60px; background: var(--primary); border: none;
+      border-radius: 40px; font-size: 20px; color: white; font-weight: bold; cursor: pointer; transition: 0.4s;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    #start-btn:hover { background: #e056fd; transform: scale(1.05); letter-spacing: 2px; }
+
+    .review-area { max-height: 220px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; border: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>Midnight</h1>
+    <p style="letter-spacing: 3px; font-weight: 300; margin-bottom: 40px; color: #aaa;">MODERN HERO ART HISTORY EXAM</p>
+    <label style="margin-bottom: 25px; cursor: pointer; opacity: 0.7;"><input type="checkbox" id="enable-sound"> ENABLE CLASSROOM AUDIO</label>
+    <button id="start-btn">TAKE YOUR SEAT</button>
+  </div>
+
+  <audio id="myAudio" loop><source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" /></audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/midnight_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="color: var(--primary); font-weight: bold; font-size: 11px; margin-bottom: 10px; letter-spacing: 2px;">
+          LECTURE STAGE: <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">Preparing the lesson...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">PREV</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">SOMNAMBULIST (50/50)</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--primary);">0/10</h1>
+        <p id="remarkText" style="font-style: italic; margin-bottom: 20px;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; margin-top:20px; background: var(--primary); border: none;" onclick="location.reload()">EXTRA CREDIT ATTEMPT</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audio = document.getElementById("myAudio");
+    document.getElementById("start-btn").addEventListener("click", () => {
+        document.getElementById("start-screen").style.opacity = "0";
+        setTimeout(() => { document.getElementById("start-screen").style.display = "none"; }, 500);
+        if (document.getElementById("enable-sound").checked) {
+            audio.currentTime = 125; audio.play();
+        }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is Midnight's civilian name?", a: "Nemuri Kayama", o: ["Nemuri Kayama", "Ryuko Tatsuma", "Anan Kurose", "Yu Takeyama"] },
+        { q: "What is the name of her Quirk?", a: "Somnambulist", o: ["Sleep Mist", "Somnambulist", "Dream State", "Aroma Control"] },
+        { q: "Which subject does Midnight teach at U.A. High School?", a: "Modern Hero Art History", o: ["Ethics", "Modern Hero Art History", "Hero Foundation Studies", "Literature"] },
+        { q: "What is the primary effect of Midnight's Quirk aroma?", a: "Putting people to sleep", o: ["Paralysis", "Confusion", "Putting people to sleep", "Hallucinations"] },
+        { q: "On which gender does Midnight's Quirk work more effectively?", a: "Males", o: ["Males", "Females", "Both equally", "Non-Quirk users"] },
+        { q: "What weapon is Midnight most famously seen using?", a: "A flogging whip", o: ["A sword", "A flogging whip", "Capture tape", "A staff"] },
+        { q: "Midnight served as the chief referee for which event?", a: "U.A. Sports Festival", o: ["Entrance Exam", "U.A. Sports Festival", "Pro Hero Licensing Exam", "Class 1-A vs 1-B"] },
+        { q: "What is Midnight's Hero Rank in her debut?", a: "R-Rated Hero", o: ["Forbidden Hero", "R-Rated Hero", "Midnight Queen", "Nightmare Hero"] },
+        { q: "Why is her hero costume designed the way it is?", a: "To allow her Quirk to escape from her skin", o: ["To intimidate villains", "To follow a theme", "To allow her Quirk to escape from her skin", "For better agility"] },
+        { q: "What is Midnight's birthday?", a: "March 9th", o: ["March 9th", "June 21st", "December 31st", "October 10th"] },
+        { q: "Which student did Midnight fight during the Final Exams arc?", a: "Mineta and Sero", o: ["Mineta and Sero", "Kaminari and Ashido", "Yaoyorozu and Todoroki", "Midoriya and Bakugo"] },
+        { q: "What is Midnight's blood type?", a: "AB", o: ["A", "B", "O", "AB"] },
+        { q: "In the 'Vigilantes' spin-off, what was Midnight's role?", a: "A student at U.A.", o: ["A pro hero student", "A teacher", "A student at U.A.", "A villain hunter"] },
+        { q: "What is her height?", a: "175 cm", o: ["168 cm", "172 cm", "175 cm", "180 cm"] },
+        { q: "What item does Midnight wear to help regulate her Quirk output?", a: "Her glasses", o: ["Special boots", "Thin stockings", "Her glasses", "A choker"] },
+        { q: "Which hero was a close friend and colleague of hers from their student days?", a: "Eraser Head & Present Mic", o: ["All Might", "Eraser Head & Present Mic", "Endeavor", "Mt. Lady"] },
+        { q: "What is Midnight's favorite thing?", a: "Youth and excitement", o: ["Fine wine", "Youth and excitement", "Art galleries", "Grading papers"] },
+        { q: "Midnight's Quirk aroma is released from which part of her body?", a: "Her skin", o: ["Her breath", "Her hair", "Her skin", "Her palms"] },
+        { q: "In the Paranormal Liberation War, who did Midnight pass her final instructions to?", a: "Momo Yaoyorozu", o: ["Momo Yaoyorozu", "Itsuka Kendo", "Shoto Todoroki", "Denki Kaminari"] },
+        { q: "What is the meaning of the 'Nemuri' in her name?", a: "Sleep", o: ["Night", "Fragrance", "Sleep", "Beauty"] }
+    ];
+
+    let highScore = localStorage.getItem("midnight_high_score") || 0;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "SUBMIT EXAM" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { showResults(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let removed = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && removed < 2) {
+                b.classList.add("hidden");
+                removed++;
+            }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function showResults() {
+        let score = 0;
+        const review = document.getElementById("reviewList");
+        review.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            review.innerHTML += `<div style="margin-bottom:10px; border-left:4px solid ${isCorrect ? 'var(--primary)' : '#e74c3c'}; padding-left:10px;">
+                <div style="font-size:13px; font-weight:bold;">${q.q}</div>
+                <div style="font-size:11px; color:var(--primary)">ANSWER: ${q.a}</div>
+            </div>`;
+        });
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("midnight_high_score", highScore);
+        }
+
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerHTML = `${score}/10 <span style="font-size:16px; color:white; display:block;">TOP GRADE: ${highScore}/10</span>`;
+        document.getElementById("remarkText").innerText = score > 7 ? "SUCH A YOUTHFUL PERFORMANCE!" : "YOU NEED TO STUDY MORE, MY DEAR STUDENT!";
+    }
+  </script>
+</body>
+</html>

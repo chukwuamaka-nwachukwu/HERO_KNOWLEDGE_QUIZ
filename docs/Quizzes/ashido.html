@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Mina Ashido</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #ff66cc; /* Acid Pink */
+      --secondary: #00ffd5; /* Alien Teal */
+      --accent: #9d00ff; /* Acid Purple */
+      --bg: #0d0014; /* Deep Dark Purple */
+      --glass: rgba(13, 0, 20, 0.85);
+      --border: rgba(255, 102, 204, 0.4);
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: var(--bg); font-family: 'Inter', sans-serif;
+      color: white; overflow: hidden;
+    }
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.4); }
+    
+    /* DARKER CINEMATIC OVERLAY */
+    .overlay { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: radial-gradient(circle, rgba(13, 0, 20, 0.5) 0%, rgba(0, 0, 0, 0.75) 100%); 
+      z-index: 2; 
+    }
+
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 6px; z-index: 10; background: rgba(255,255,255,0.05); }
+    #progressBar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: 0.4s; box-shadow: 0 0 20px var(--primary); }
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+
+    .circle-btn {
+      width: 50px; height: 50px; border-radius: 50%; background: #000; color: var(--primary);
+      border: 1px solid var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 20px;
+    }
+    .circle-btn:hover { transform: scale(1.1) rotate(90deg); background: var(--primary); color: white; box-shadow: 0 0 30px var(--primary); }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--border);
+      width: 90%; max-width: 650px; border-radius: 30px; padding: 45px; text-align: center;
+      box-shadow: 0 0 50px rgba(255, 102, 204, 0.1);
+    }
+
+    #questionText { font-size: 24px; font-weight: 300; line-height: 1.4; color: #fff; margin-bottom: 25px; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      padding: 18px; border-radius: 15px; color: #ddd; cursor: pointer; transition: 0.3s; font-size: 16px;
+    }
+    .option-btn:hover { background: rgba(255, 102, 204, 0.15); border-color: var(--secondary); color: white; transform: translateY(-2px); }
+    .option-btn.selected { background: var(--primary) !important; color: white !important; font-weight: 800; border-color: white; box-shadow: 0 0 15px var(--primary); }
+    .option-btn.hidden { opacity: 0; pointer-events: none; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; }
+    
+    .nav-btn {
+      background: none; border: 1px solid var(--secondary); color: var(--secondary);
+      padding: 12px 30px; border-radius: 50px; cursor: pointer; transition: 0.3s; font-weight: bold; font-size: 13px;
+    }
+    .nav-btn:hover:not(:disabled) { background: var(--secondary); color: black; }
+    .nav-btn:disabled { opacity: 0.2; cursor: not-allowed; border-color: white; color: white; }
+
+    .lifeline-btn { 
+        background: rgba(157, 0, 255, 0.4); border: 1px solid var(--accent); padding: 10px 20px; 
+        border-radius: 50px; color: white; cursor: pointer; font-size: 11px; font-weight: bold; letter-spacing: 1px;
+    }
+    .lifeline-btn:hover:not(:disabled) { background: var(--accent); box-shadow: 0 0 15px var(--accent); }
+
+    /* START SCREEN - UNIFIED DARK STYLE */
+    #start-screen {
+      position: fixed; inset: 0; background: #050008; color: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
+    }
+    #start-screen h1 { font-size: 50px; color: var(--primary); letter-spacing: 10px; margin: 0; text-transform: uppercase; }
+    #start-screen p { font-style: italic; opacity: 0.6; margin-bottom: 40px; }
+    #start-screen button {
+      padding: 18px 60px; background: transparent; border: 2px solid var(--primary);
+      border-radius: 50px; font-size: 20px; color: var(--primary); font-weight: bold; cursor: pointer; transition: 0.4s;
+    }
+    #start-screen button:hover { background: var(--primary); color: white; box-shadow: 0 0 40px var(--primary); letter-spacing: 2px; }
+
+  .site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+    .review-area { max-height: 250px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.6); padding: 20px; border-radius: 20px; border: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>PINKY</h1>
+    <p>"Let's dance our way to victory!"</p>
+    <label style="margin-bottom: 30px; cursor: pointer; opacity: 0.7;"><input type="checkbox" id="enable-sound"> Synchronize Groove (Audio)</label>
+    <button id="start-btn">BEGIN EVALUATION</button>
+  </div>
+
+  <audio id="myAudio" loop>
+    <source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" />
+  </audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+
+  <video id="bgVideo" autoplay muted loop playsinline>
+    <source src="../Static/ashido_gid.mp4" type="video/mp4">
+  </video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="color: var(--secondary); letter-spacing: 2px; font-size: 11px; margin-bottom: 10px; font-weight: bold;">
+          ENERGY LEVEL: <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">Sliding into position...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">BACK</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">ACID LAYDOWN (50/50)</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--primary); text-shadow: 0 0 20px var(--primary);">0/10</h1>
+        <p id="remarkText" style="font-weight: bold; margin-bottom: 20px;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; margin-top:20px; background: var(--primary); color: white;" onclick="location.reload()">RE-ATTEMPT (FOR THE SQUAD)</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const startScreen = document.getElementById("start-screen");
+    const startBtn = document.getElementById("start-btn");
+    const audio = document.getElementById("myAudio");
+    const soundCheck = document.getElementById("enable-sound");
+
+    startBtn.addEventListener("click", () => {
+        startScreen.style.display = "none";
+        if (soundCheck.checked) {
+            audio.currentTime = 125; audio.play();
+        }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is Mina Ashido's official Hero Name?", a: "Pinky", o: ["Pinky", "Alien Queen", "Acid Queen", "Melter"] },
+        { q: "What was Mina's first choice for her hero name before it was rejected?", a: "Alien Queen", o: ["Pinky", "Alien Queen", "Acidic", "Slime Queen"] },
+        { q: "What is the name of Mina's Quirk?", a: "Acid", o: ["Acid", "Corrosion", "Pink Slime", "Meltdown"] },
+        { q: "What is Mina's favorite hobby?", a: "Dancing", o: ["Dancing", "Shopping", "Cooking", "Singing"] },
+        { q: "Which class 1-A student did Mina go to middle school with?", a: "Eijiro Kirishima", o: ["Denki Kaminari", "Eijiro Kirishima", "Katsuki Bakugo", "Momo Yaoyorozu"] },
+        { q: "What is the name of Mina's ultimate defensive move?", a: "Acid Veil", o: ["Acid Veil", "Corrosion Shield", "Pink Wall", "Melter Guard"] },
+        { q: "What does Mina use her acid for to move quickly across the battlefield?", a: "Sliding", o: ["Flying", "Sliding", "Jumping", "Teleporting"] },
+        { q: "Mina is part of the '_____ Squad' along with Kaminari and Kirishima.", a: "Bakugo", o: ["Bakugo", "Deku", "Disco", "Party"] },
+        { q: "Which giant villain did Mina stand up to in middle school?", a: "Gigantomachia", o: ["Gigantomachia", "All For One", "Muscular", "Stain"] },
+        { q: "What is Mina's birthday?", a: "July 30th", o: ["July 30th", "June 15th", "August 2nd", "April 1st"] },
+        { q: "In the Sports Festival, who defeated Mina in the tournament?", a: "Fumikage Tokoyami", o: ["Shoto Todoroki", "Fumikage Tokoyami", "Tenya Iida", "Yuga Aoyama"] },
+        { q: "Mina can control both the viscosity and the _____ of her acid.", a: "Solubility", o: ["Color", "Temperature", "Solubility", "Smell"] },
+        { q: "What is Mina's seat number in Class 1-A?", a: "2", o: ["1", "2", "5", "10"] },
+        { q: "Mina taught the class how to dance for which school event?", a: "U.A. School Festival", o: ["U.A. School Festival", "Training Camp", "Christmas Party", "Dorm Competition"] },
+        { q: "What is Mina's blood type?", a: "AB", o: ["A", "B", "AB", "O"] },
+        { q: "Mina's horns are a result of what?", a: "Her Quirk", o: ["Her Quirk", "An accident", "Prosthetics", "A mutation"] },
+        { q: "What is Mina's height?", a: "159 cm", o: ["150 cm", "159 cm", "165 cm", "170 cm"] },
+        { q: "During the First Term Final Exam, who was Mina paired with?", a: "Denki Kaminari", o: ["Eijiro Kirishima", "Denki Kaminari", "Hantaro Sero", "Minoru Mineta"] },
+        { q: "What is Mina's favorite food?", a: "Okonomiyaki", o: ["Natō", "Okonomiyaki", "Ramen", "Crepes"] },
+        { q: "What is the primary color of Mina's hero costume vest?", a: "Teal/Turquoise", o: ["Pink", "Purple", "Teal/Turquoise", "Yellow"] }
+    ];
+
+    let highScore = localStorage.getItem("mina_high_score") || 0;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "FINISH EVALUATION" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { calculateResults(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let count = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && count < 2) { b.classList.add("hidden"); count++; }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function calculateResults() {
+        let score = 0;
+        const reviewList = document.getElementById("reviewList");
+        reviewList.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            reviewList.innerHTML += `<div style="margin-bottom:12px; border-left:4px solid ${isCorrect ? 'var(--secondary)' : 'var(--primary)'}; padding-left:15px;">
+                <div style="font-size:14px;">${q.q}</div>
+                <div style="font-size:12px; color:${isCorrect ? 'var(--secondary)' : 'var(--primary)'}">Result: ${q.a}</div>
+            </div>`;
+        });
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerHTML = `${score}/10 <div style="font-size:16px; color:white; margin-top:5px;">BEST: ${highScore}/10</div>`;
+        document.getElementById("remarkText").innerText = score > 7 ? "ACIDIC ACCURACY! YOU PASSED!" : "SLIDE BACK AND TRY AGAIN!";
+    }
+  </script>
+</body>
+</html>

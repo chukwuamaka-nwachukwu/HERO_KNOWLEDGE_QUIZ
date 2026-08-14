@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Character Showcase</title>
+  <link rel="shortcut icon" href="./Static/mha_logo.png" type="image/x-icon">
+
+  <style>
+    body {
+      margin: 0;
+      background-color: #050505;
+      color: white;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    video {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.85) 100%);
+      z-index: 2;
+    }
+
+    h1 {
+      position: absolute;
+      top: 10px;
+      left:-250px;
+      text-align: center;
+      width: 600px;
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #ffffff;
+      z-index: 16;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      margin-bottom: 30px;
+    }
+
+    /* Fullscreen Button - High Visibility */
+    .curved-button {
+      position: absolute;
+      top: 25px;
+      left: 25px;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: #b0afaf;
+      color: #000;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(255,255,255,0.4);
+      transition: all 0.3s ease;
+    }
+    .curved-button:hover {
+      transform: scale(1.1);
+      background: #6a7a75;
+      box-shadow: 0 0 30px #546f66;
+    }
+    .button-group{
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    /* Randomize Button - High Visibility */
+    .random-btn {
+      position: static; /* Remove absolute positioning */
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border: 2px solid #ffffff;
+      color: rgb(146, 140, 140);
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      z-index: 20;
+      
+    }
+.page-header {
+  padding: 20px;
+  text-align: center;
+  z-index: 15;
+}
+
+.page-header h1 {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  left:470px;
+  margin-top: 0;
+
+}
+
+main.content {/* pushes footer down */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+    .random-btn:hover {
+      background: #6a7a75;
+      color: #000;
+      transform: translateY(-3px);
+      box-shadow: 0 0 25px rgba(255,255,255,0.6);
+    }
+
+    #indicator {
+      position: absolute;
+      bottom: 80px;
+      display: flex;
+      gap: 10px;
+      z-index: 6;
+    }
+
+    #indicator span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: rgba(255,255,255,0.2);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    #indicator span.active { transform: scale(1.6); }
+
+    .character-card {
+      position: relative;
+      z-index: 5;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(25px) saturate(160%);
+      -webkit-backdrop-filter: blur(25px) saturate(160%);
+      width: 420px;
+      height: 480px;
+      border-radius: 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: transform 0.8s ease, opacity 0.8s ease, box-shadow 0.6s ease;
+    }
+
+    .slide-left { transform: translateX(-100%); opacity: 0; }
+    .slide-right { transform: translateX(100%); opacity: 0; }
+    .slide-in { transform: translateX(2%); opacity: 1; }
+
+    .character-card img {
+      width: 100%;
+      height: 380px;
+      object-fit: cover;
+      mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+    }
+
+    .character-info { padding: 30px; }
+    .character-info h2 { font-size: 32px; margin: 0; color: #fff; font-weight: 800; }
+    .character-info p { font-size: 15px; color: rgba(255,255,255,0.8); margin: 12px 0 20px 0; line-height: 1.5; }
+
+    .start-btn {
+      padding: 12px 35px;
+      background: #fff;
+      color: #000;
+      text-decoration: none;
+      border-radius: 50px;
+      text-transform: uppercase;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 60px;
+      color: rgba(255,255,255,0.3);
+      cursor: pointer;
+      z-index: 6;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+    .arrow:hover { color: #fff; transform: translateY(-50%) scale(1.2); }
+    .left-arrow { left: 50px; }
+    .right-arrow { right: 50px; }
+
+    #start-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      transition: opacity 0.5s ease;
+    }
+    #start-screen button {
+      padding: 16px 50px;
+      background: #1dbf73;
+      border: none;
+      border-radius: 50px;
+      font-size: 20px;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .back-home-button {
+    position: absolute;
+    top: 25px;
+    right: 25px; /* Opposite side of fullscreen */
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #000;
+    border: none;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(255,255,255,0.4);
+    transition: all 0.3s ease;
+    line-height: 0;
+    text-decoration: none;
+  }
+
+  .back-home-button:hover {
+    transform: scale(1.1) rotate(90deg); /* Cool rotation effect on hover */
+    background: #ff4b4b; /* Turns red for 'exit' */
+    color: white;
+    box-shadow: 0 0 30px rgba(255, 75, 75, 0.6);
+  }
+
+#search-link {
+  margin-top: -40px;
+  text-align: center;
+  border-radius: 15px;
+  background: rgb(83, 95, 83);
+  width:400px;
+  height:35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#search-link a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.3s ease;
+  justify-content: center;
+}
+#search-link a:hover { color: #38bdf8; }
+
+.search-container {
+  display: none;
+  margin-top: -20px;
+  text-align: center;
+  position: relative;
+}
+
+#heroSearch {
+  width: 320px;
+  padding: 12px 20px;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+#close-search {
+  position: absolute;
+  right: -35px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+}
+#close-search:hover { color: #ff4b4b; }
+
+.search-results {
+  position: absolute;
+  top: 55px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  border-radius: 15px;
+  max-height: 250px;
+  overflow-y: auto;
+  display: none; /* Hidden by default */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.result-item {
+  padding: 12px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: 0.2s;
+}
+
+.result-item:hover {
+  background: #1dbf73;
+  color: black;
+}
+     .site-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.85);
+    color: #ccc;
+    text-align: center;
+    padding: 12px 0;
+    font-size: 14px;
+    z-index: 20;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+  }
+
+  .site-footer .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .site-footer p {
+    margin: 4px 0;
+  }
+
+  .footer-links a {
+    color: #38bdf8;
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.3s ease;
+  }
+
+  .footer-links a:hover {
+    color: #00ffaa;
+  }
+
+/* Universal responsive layout for tablets and phones */
+@media (max-width: 1024px){
+  body {
+    overflow-y: auto; /* allow scrolling on smaller devices */
+    padding: 0 10px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+    text-align: center;
+    margin: 15px auto;
+    position: static; /* remove absolute positioning */
+    margin-bottom: 99px;
+    margin-left: 350px;
+
+  }
+.search-container{
+  margin-top: -199px;
+}
+  #search-link {
+    width: 90%;
+    max-width: 320px;
+    padding: 8px;
+    font-size: 15px;
+    margin: 15px auto;
+    margin-top:-90px;
+    margin-bottom: 10px;
+  }
+
+  #heroSearch {
+    width: 100%;
+    font-size: 15px;
+  }
+
+  .character-card {
+    width: 100%;
+    max-width: 420px;
+    height: 550px; /* let content define height */
+    margin: 20px auto;
+    padding: 15px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .character-card img {
+    height: auto; /* scale naturally */
+    max-height: 280px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    padding-bottom: 40px;
+    object-fit: cover;
+    width: 580px;
+  }
+
+  .character-info {
+    padding: 10px;
+    text-align: center;
+  }
+
+  .character-info h2 {
+    font-size: 24px;
+    margin: 10px 0;
+    margin-bottom: 30px;
+  }
+
+  .character-info p {
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 60px;
+  }
+
+  /* Arrows fixed */
+  .arrow {
+    font-size: 28px;
+    position: absolute;
+    top: 50%;              /* center vertically */
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.7);
+    z-index: 10;
+  }
+
+  .left-arrow { left: 60px;top:630px;font-size: 68px; }   /* move slightly outside card */
+  .right-arrow { right: 60px;top:630px;font-size: 68px; } /* move slightly outside card */
+  #indicator {
+    margin: 20px auto;
+    width: 80%;
+    justify-content: center;
+    margin-bottom: 100px;
+  }
+
+  .site-footer {
+    font-size: 13px;
+    padding: 10px 0;
+    height:60px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .footer-links {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .curved-button {
+    display: none; /* hide fullscreen button on smaller devices */
+  }
+
+  #backHomeBtn {
+    width: 40px;
+    height: 40px;
+    top: 20px;
+    right: 20px;
+  }
+  .button-group{
+    margin-bottom: 30px;
+    gap:40px;
+  }
+}
+/* Universal responsive layout for tablets and phones */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto;
+    padding: 0 10px;
+  }
+
+  .page-header h1 {
+    font-size: 20px;
+    text-align: center;
+    margin: 10px auto;
+    position: absolute;
+    left: 110px;
+    margin-bottom: 0px;
+  }
+
+  #search-link {
+    width: 100%;
+    width: 320px;
+    padding: 4px;
+    font-size: 14px;
+    margin-top:-40px;
+
+  }
+
+  .search-container {
+    margin: 10px auto;
+    text-align: center;
+    margin-top: -40px;
+  }
+
+  #heroSearch {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .character-card {
+    width: 100%;
+    max-width: 320px;
+    height: 380px; /* keep card size */
+    margin: 20px auto;
+    padding: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    background: rgba(255,255,255,0.05);
+    margin-top: -20px;
+  }
+
+  .character-card img {
+    width: 100%;
+    height: auto;
+    max-height: 330px; /* reduced image height */
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+
+  .character-info {
+    padding: 8px;
+    text-align: center;
+  }
+
+  .character-info h2 {
+    font-size: 18px; /* smaller heading */
+    margin: 6px 0;
+  }
+
+  .character-info p {
+    font-size: 12px; /* smaller description */
+    line-height: 1.3;
+    margin: 6px 0;
+  }
+
+  .button-group {
+    margin: 15px auto;
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+
+  /* Arrows fixed */
+  .arrow {
+    font-size: 28px;
+    position: absolute;
+    top: 50%;              /* center vertically */
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.7);
+    z-index: 10;
+  }
+
+  .left-arrow { left: 20px;top:350px }   /* move slightly outside card */
+  .right-arrow { right: 10px;top:350px } /* move slightly outside card */
+  #indicator {
+    margin: 15px auto;
+    width: 80%;
+    justify-content: center;
+  }
+
+  .site-footer {
+    font-size: 11px;
+    padding: 6px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-links {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    margin-top: 4px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .curved-button {
+    display: none;
+  }
+
+  #backHomeBtn {
+    width: 30px;
+    height: 30px;
+    top: 12px;
+    right: 12px;
+  }
+
+  #start-screen h1 {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  #start-btn {
+    height: 36px;
+    font-size: 14px;
+    padding: 0 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+
+  </style>
+</head>
+
+<body>
+  <video id="bgVideo" muted playsinline loop></video>
+  <div class="overlay"></div>
+
+  <audio id="myAudio" loop muted>
+    <source src="./Static/all_might_theme.mp3" type="audio/mp3" />
+  </audio>
+
+  <button class="curved-button" id="fullscreenButton" title="Toggle Fullscreen">⛶</button>
+  <button class="back-home-button" id="backHomeBtn" title="Back to Dashboard">✖</button>
+  <header class="page-header">
+  <h1>HERO SELECTION</h1>
+  <div id="search-link">
+    <a href="#" id="open-search">
+      <span class="search-text">Search</span> 🌐
+    </a>
+  </div>
+
+  <div class="search-container" id="search-container">
+    <input type="text" id="heroSearch" placeholder="Search heroes...">
+    <span id="close-search">✖</span>
+     <div id="searchResults" class="search-results"></div>
+  </div>
+</header>
+  <main class="content">
+  <div class="arrow left-arrow" id="prevBtn">⟨</div>
+  <div class="arrow right-arrow" id="nextBtn">⟩</div>
+
+  <div class="character-card" id="heroCard"></div>
+  
+  <div id="indicator"></div>
+  </main>
+  <footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer>
+
+  <div id="start-screen">
+    <h1 style="position:static; margin-bottom: 20px;">UA Hero Selection</h1>
+    <label style="margin-bottom: 30px; cursor: pointer;"><input type="checkbox" id="enable-sound"> Synchronize audio</label>
+    <button id="start-btn">Begin</button>
+  </div>
+
+  <script>
+    const backBtn = document.getElementById("backHomeBtn");
+
+    backBtn.addEventListener("click", () => {
+      window.location.href = "./index.html"; 
+    });
+    const heroes = [
+      { name: "Toshinori Yagi", color: "#ffd700", glow: "#ffd500", desc: "The Symbol of Peace — an everlasting legend and beacon of hope.", video: "./Static/all_might_gid.mp4", quiz: "./Quizzes/allmight.html", image: "./Static/toshinori_yagi.jpg" },
+      { name: "Izuku Midoriya", color: "#00ff88", glow: "#00ffaa", desc: "The next Symbol of Peace, fighting for a brighter, safer world.", video: "./Static/deku_gid.mp4", quiz: "./Quizzes/deku.html", image: "./Static/deku.jpg" },
+      { name: "Katsuki Bakugo", color: "#ff7b00", glow: "#ffae00", desc: "Explosive power and unyielding pride. He strives to be the number one.", video: "./Static/bakugo_gid.mp4", quiz: "./Quizzes/bakugo.html", image: "./Static/bakugo.jpg" },
+      { name: "Tamaki Amajiki", color: "#4b6bff", glow: "#4b4ff", desc: "Shy yet powerful hero, mastering his unique dietary abilities.", video: "./Static/amajiki_gid.mp4", quiz: "./Quizzes/amajiki.html", image: "./Static/amajiki.jpg" },
+      { name: "Yuga Aoyama", color: "#66ccff", glow: "#99e6ff", desc: "Always sparkling and fabulous, with a naval laser of pure brilliance.", video: "./Static/aoyoma_gid.mp4", quiz: "./Quizzes/aoyama.html", image: "./Static/aoyoma.jpg" },
+      { name: "Mina Ashido", color: "#ff66b3", glow: "#ff9ad1", desc: "A queen of energy with unstoppable acid-based combat moves!", video: "./Static/ashido_gid.mp4", quiz: "./Quizzes/ashido.html", image: "./Static/ashido.jpg" },
+      { name: "Tsuyu Asui", color: "#2ef0a3", glow: "#66ffd6", desc: "A calm and collected frog-hero, always reliable in any environment.", video: "./Static/froppy_gid.mp4", quiz: "./Quizzes/asui.html", image: "./Static/asui.png" },
+      { name: "Endeavour", color: "#ff6b4b", glow: "#ff8f74", desc: "The Flame Hero who burns with the heat of pride and redemption.", video: "./Static/endeavour_gid.mp4", quiz: "./Quizzes/endeavour.html", image: "./Static/endeavour.jpg" },
+      { name: "Nejire Hado", color: "#9be3ff", glow: "#cff7ff", desc: "Radiant wave energy and curiosity — a stellar member of The Big Three.", video: "./Static/hado_gid.mp4", quiz: "./Quizzes/hado.html", image: "./Static/hado.jpg" },
+      { name: "Hawks", color: "#ffd966", glow: "#ffe699", desc: "Fast, fearless, and sharp-witted. The man who flies a bit too fast.", video: "./Static/hawks_gid.mp4", quiz: "./Quizzes/hawks.html", image: "./Static/hawks.png" },
+      { name: "Kyoka Jiro", color: "#8b5cff", glow: "#b79aff", desc: "Sound-based precision. Her music and might are in perfect sync.", video: "./Static/jiro_gid.mp4", quiz: "./Quizzes/jiro.html", image: "./Static/jiro.jpg" },
+      { name: "Denki Kaminari", color: "#ffd24d", glow: "#ffe88a", desc: "A hero with a bright spark and electric personality.", video: "./Static/kaminari_gid.mp4", quiz: "./Quizzes/kaminari.html", image: "./Static/kaminari.jpg" },
+      { name: "Itsuka Kendo", color: "#75c7ff", glow: "#9fe0ff", desc: "Class 1-B's leader — big fists, bigger heart, and sharp intellect.", video: "./Static/kendo_gid.mp4", quiz: "./Quizzes/kendo.html", image: "./Static/kendo.png" },
+      { name: "Eijiro Kirishima", color: "#ff3b3b", glow: "#ff6b6b", desc: "The Sturdy Hero: Red Riot. Unbreakable spirit and harder skin.", video: "./Static/kirishima_gid.mp4", quiz: "./Quizzes/kirishima.html", image: "./Static/kirishima.png" },
+      { name: "Mei Hatsume", color: "#ff99cc", glow: "#ffcce6", desc: "A genius inventor who refers to her gear as her 'babies'.", video: "./Static/mei_hatsume_gid.mp4", quiz: "./Quizzes/hatsume.html", image: "./Static/mei_hatsume.jpg" },
+      { name: "Midnight", color: "#e6a3ff", glow: "#f0c9ff", desc: "The R-Rated Hero with poise, power, and an alluring aroma.", video: "./Static/midnight_gid.mp4", quiz: "./Quizzes/midnight.html", image: "./Static/midnight.jpg" },
+      { name: "Minoru Mineta", color: "#b86bff", glow: "#d3a6ff", desc: "Small in size, but his sticky grapes can trap any villain.", video: "./Static/mineta_gid.mp4", quiz: "./Quizzes/mineta.html", image: "./Static/mineta.webp" },
+      { name: "Momo Yaoyorozu", color: "#ffb27a", glow: "#ffd8b5", desc: "A hero with unmatched intelligence and the power of creation.", video: "./Static/momo_gid.mp4", quiz: "./Quizzes/momo.html", image: "./Static/momo.png" },
+      { name: "Neito Monoma", color: "#a0e1ff", glow: "#cff6ff", desc: "The copy hero with endless ambition and a flair for the dramatic!", video: "./Static/monoma_gid.mp4", quiz: "./Quizzes/monoma.html", image: "./Static/monoma.png" },
+      { name: "Ochaco Uraraka", color: "#ff9dd8", glow: "#ffbfe6", desc: "A zero-gravity hero with a dream to lift others up.", video: "./Static/ochaco_uraraka_gid.mp4", quiz: "./Quizzes/uraraka.html", image: "./Static/ochaco_uraraka.png" },
+      { name: "Hitoshi Shinso", color: "#8e44ad", glow: "#b58ed9", desc: "A hero with the power of brainwashing and the will to do good.", video: "./Static/shinso_gid.mp4", quiz: "./Quizzes/shinso.html", image: "./Static/shinso.png" },
+      { name: "Shota Aizawa", color: "#9fa7a6", glow: "#cfd6d6", desc: "Eraserhead: The pro hero who works from the shadows.", video: "./Static/eraserhead_gid.mp4", quiz: "./Quizzes/aizawa.html", image: "./Static/shota_aizawa.jpg" },
+      { name: "Shoto Todoroki", color: "#66ccff", glow: "#a6e6ff", desc: "Master of fire and ice, seeking his own path to greatness.", video: "./Static/todoroki_gid.mp4", quiz: "./Quizzes/todoroki.html", image: "./Static/shoto_todoroki.jpg" },
+      { name: "Tenya Iida", color: "#4da6ff", glow: "#9fdcff", desc: "Ingenium: A speedster driven by duty, rules, and discipline.", video: "./Static/tenya_gid.mp4", quiz: "./Quizzes/iida.html", image: "./Static/tenya_iida.png" },
+      { name: "Mirio Togata", color: "#ffd480", glow: "#ffe9b8", desc: "Lemillion: The man who can phase through any obstacle with a smile.", video: "./Static/mirio_gid.mp4", quiz: "./Quizzes/togata.html", image: "./Static/togata.png" },
+      { name: "Fumikage Tokoyami", color: "#2b2b2b", glow: "#5a5a5a", desc: "A poetic hero master of the shadow, Tsukuyomi.", video: "./Static/tokoyami_gid.mp4", quiz: "./Quizzes/tokoyami.html", image: "./Static/tokoyami.png" }
+    ];
+
+    const startTimes = [6, 27, 4, 10, 5, 5, 6, 7, 0, 0, 15, 3, 9, 6, 8, 6, 9, 7, 4, 7, 3, 2, 12, 6, 4, 5];
+
+    const bgVideo = document.getElementById("bgVideo");
+    const heroCard = document.getElementById("heroCard");
+    const indicator = document.getElementById("indicator");
+    const audio = document.getElementById("myAudio");
+    const startScreen = document.getElementById("start-screen");
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const fsBtn = document.getElementById("fullscreenButton");
+
+    let index = 0;
+
+    function hexToRgba(hex, alpha = 1) {
+      const h = hex.replace('#','');
+      const bigint = parseInt(h.length === 3 ? h.split('').map(c=>c+c).join('') : h, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function updateIndicator() {
+      indicator.innerHTML = heroes.map((_, i) => `<span class="${i === index ? 'active' : ''}"></span>`).join('');
+      const spans = indicator.querySelectorAll('span');
+      spans.forEach((s, i) => {
+        if (i === index) {
+          s.style.background = hexToRgba(heroes[index].glow, 0.8);
+          s.style.boxShadow = `0 0 15px ${hexToRgba(heroes[index].glow, 0.5)}`;
+        }
+      });
+    }
+
+    function applyTheme(hero) {
+      const glow = hero.glow || hero.color;
+      heroCard.style.boxShadow = `0 30px 60px rgba(0,0,0,0.6), 0 0 30px ${hexToRgba(glow, 0.3)}`;
+      heroCard.style.borderColor = hexToRgba(hero.color, 0.4);
+      
+      const startBtnEl = heroCard.querySelector('.start-btn');
+      if (startBtnEl) {
+        startBtnEl.style.background = hero.color;
+        startBtnEl.style.color = (hero.color === '#2b2b2b' || hero.color === '#0f0f0f') ? '#fff' : '#000';
+        startBtnEl.style.boxShadow = `0 0 15px ${hexToRgba(glow, 0.4)}`;
+      }
+    }
+
+    // Handle the Video Loop from specific startTimes
+    bgVideo.onended = () => {
+      bgVideo.currentTime = startTimes[index] || 0;
+      bgVideo.play();
+    };
+
+    function showHero(i, direction = "right") {
+      const hero = heroes[i];
+      const start = startTimes[i] || 0;
+
+      heroCard.classList.remove("slide-in");
+      heroCard.classList.add(direction === "right" ? "slide-left" : "slide-right");
+
+      setTimeout(() => {
+        bgVideo.src = hero.video;
+        bgVideo.onloadedmetadata = () => {
+          try { bgVideo.currentTime = start; } catch (e) {}
+          bgVideo.play().catch(()=>{});
+        };
+
+        heroCard.innerHTML = `
+          <img src="${hero.image}" alt="${hero.name}">
+          <div class="character-info">
+            <h2>${hero.name}</h2>
+            <p>${hero.desc}</p>
+            <div class="button-group">
+            <a href="${hero.quiz}" class="start-btn">Start Quiz</a>
+            <button class="random-btn" id="randomBtn">🎲 Randomize</button>
+            </div>
+          </div>`;
+
+          const randomBtn = document.getElementById("randomBtn");
+
+          randomBtn.addEventListener("click", () => {
+            let randomIndex;
+            do {
+              randomIndex = Math.floor(Math.random() * heroes.length);
+            } while (randomIndex === index);
+
+            index = randomIndex;
+            showHero(index, Math.random() > 0.5 ? "left" : "right");
+          });
+
+        heroCard.classList.remove("slide-left", "slide-right");
+        heroCard.classList.add("slide-in");
+
+        setTimeout(()=> applyTheme(hero), 50);
+        updateIndicator();
+      }, 350);
+    }
+
+    nextBtn.addEventListener("click", () => {
+      index = (index + 1) % heroes.length;
+      showHero(index, "right");
+    });
+
+    prevBtn.addEventListener("click", () => {
+      index = (index - 1 + heroes.length) % heroes.length;
+      showHero(index, "left");
+    });
+
+
+    fsBtn.addEventListener("click", () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(()=>{});
+      } else {
+        document.exitFullscreen().catch(()=>{});
+      }
+    });
+
+    document.getElementById("start-btn").addEventListener("click", () => {
+      if (document.getElementById("enable-sound").checked) {
+        audio.muted = false;
+        audio.play().catch(err => console.log(err));
+      }
+      startScreen.style.opacity = "0";
+      setTimeout(() => {
+        startScreen.style.display = "none";
+        showHero(index);
+      }, 500);
+    });
+
+    updateIndicator();
+const searchInput = document.getElementById('heroSearch');
+const searchResults = document.getElementById('searchResults');
+const openSearch = document.getElementById('open-search');
+const searchLink = document.getElementById('search-link');
+const searchContainer = document.getElementById('search-container');
+const closeSearch = document.getElementById('close-search');
+
+// Toggle open
+openSearch.addEventListener('click', (e) => {
+  e.preventDefault();
+  searchLink.style.display = 'none';
+  searchContainer.style.display = 'inline-block';
+  searchInput.focus();
+});
+
+// Toggle close
+closeSearch.addEventListener('click', () => {
+  searchContainer.style.display = 'none';
+  searchLink.style.display = 'block';
+  searchResults.style.display = 'none';
+  searchInput.value = '';
+});
+
+// Search filtering
+searchInput.addEventListener('input', (e) => {
+  const term = e.target.value.toLowerCase();
+  searchResults.innerHTML = '';
+
+  if (term.length < 1) {
+    searchResults.style.display = 'none';
+    return;
+  }
+
+  const filtered = heroes.filter(h => h.name.toLowerCase().includes(term));
+  if (filtered.length > 0) {
+    filtered.forEach(hero => {
+      const div = document.createElement('div');
+      div.className = 'result-item';
+      div.innerText = hero.name;
+      div.onclick = () => {
+        const heroIndex = heroes.findIndex(h => h.name === hero.name);
+        index = heroIndex;
+        showHero(index, "right");
+        searchInput.value = '';
+        searchResults.style.display = 'none';
+      };
+      searchResults.appendChild(div);
+    });
+    searchResults.style.display = 'block';
+  } else {
+    searchResults.style.display = 'none';
+  }
+});
+
+// Close results if clicking outside
+document.addEventListener('click', (e) => {
+  if (!searchContainer.contains(e.target) && e.target !== openSearch) {
+    searchResults.style.display = 'none';
+  }
+});
+
+
+  </script>
+</body>
+</html>

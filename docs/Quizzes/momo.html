@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Momo Yaoyorozu</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #c0392b; /* Deep Crimson */
+      --secondary: #f1c40f; /* Gold */
+      --accent: #fdf5e6; /* Cream */
+      --glass: rgba(30, 0, 0, 0.9);
+      --border: rgba(241, 196, 15, 0.5);
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: #1a0000; font-family: 'Inter', sans-serif;
+      color: white; overflow: hidden;
+    }
+
+    /* Molecular Grid Background */
+    body::before {
+      content: ""; position: fixed; width: 100%; height: 100%;
+      background-image: radial-gradient(var(--border) 1px, transparent 1px);
+      background-size: 35px 35px; opacity: 0.1; z-index: 0;
+    }
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.4) contrast(1.2); }
+    .overlay { position: fixed; inset: 0; background: radial-gradient(circle, rgba(20,20,20,0.7) 0%, rgba(5,5,5,0.95) 100%); z-index: 2; }
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 8px; z-index: 10; background: rgba(255,255,255,0.05); }
+    #progressBar { 
+      height: 100%; width: 0%; 
+      background: linear-gradient(90deg, var(--primary), var(--secondary)); 
+      box-shadow: 0 0 15px var(--primary);
+      transition: 0.6s ease; 
+    }
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    
+    .circle-btn {
+      width: 48px; height: 48px; border-radius: 50%; background: white; color: #1a0000;
+      border: 2px solid var(--secondary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 18px;
+    }
+    .circle-btn:hover { transform: translateY(-3px); background: var(--secondary); box-shadow: 0 0 20px var(--secondary); }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--border);
+      width: 90%; max-width: 650px; border-radius: 4px; padding: 45px; text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+      position: relative;
+    }
+    /* Corner Accents */
+    .quiz-card::after { content: ""; position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-top: 2px solid var(--secondary); border-right: 2px solid var(--secondary); }
+    .quiz-card::before { content: ""; position: absolute; bottom: 10px; left: 10px; width: 30px; height: 30px; border-bottom: 2px solid var(--secondary); border-left: 2px solid var(--secondary); }
+
+    #questionText { font-size: 24px; font-weight: 600; margin-bottom: 30px; color: var(--accent); letter-spacing: 0.5px; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border);
+      padding: 18px; border-radius: 2px; color: white; cursor: pointer; transition: 0.3s; 
+      font-size: 15px; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .option-btn:hover { background: rgba(192, 57, 43, 0.25); border-color: var(--primary); }
+    .option-btn.selected { background: var(--primary) !important; color: white !important; border-color: var(--secondary); font-weight: bold; }
+    .option-btn.hidden { opacity: 0; pointer-events: none; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+    
+    .nav-btn {
+      background: none; border: 1px solid var(--secondary); color: var(--secondary);
+      padding: 10px 30px; border-radius: 0; cursor: pointer; transition: 0.3s;
+      font-weight: bold; font-size: 12px; letter-spacing: 2px;
+    }
+    .nav-btn:hover:not(:disabled) { background: var(--secondary); color: black; }
+    .nav-btn:disabled { opacity: 0.1; }
+
+    .lifeline-btn { 
+        background: transparent; border: 1px solid var(--primary); padding: 10px 20px; 
+        color: var(--primary); cursor: pointer; font-size: 10px;
+        font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px;
+    }
+    .lifeline-btn:hover:not(:disabled) { background: var(--primary); color: white; }
+
+    #start-screen {
+      position: fixed; inset: 0; background: #000; color: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
+    }
+    #start-screen h1 { font-size: 55px; margin: 0; color: var(--secondary); letter-spacing: 10px; text-transform: uppercase; }
+
+    #start-btn {
+      padding: 18px 65px; background: var(--primary); border: 1px solid var(--secondary);
+      color: white; font-weight: bold; cursor: pointer; transition: 0.4s; letter-spacing: 3px;
+    }
+    #start-btn:hover { background: #962d22; box-shadow: 0 0 30px rgba(192, 57, 43, 0.4); }
+
+    .review-area { max-height: 220px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.6); padding: 20px; border-radius: 5px; border: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>CREATI</h1>
+    <p style="letter-spacing: 3px; font-weight: 300; margin-bottom: 45px; color: var(--secondary); font-size: 12px;">STRATEGIC EVALUATION EXAM</p>
+    <label style="margin-bottom: 30px; cursor: pointer; opacity: 0.8;"><input type="checkbox" id="enable-sound"> CALIBRATE AUDIO CHANNELS</label>
+    <button id="start-btn">BEGIN SESSION</button>
+  </div>
+
+  <audio id="myAudio" loop><source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" /></audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/momo_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="color: var(--secondary); font-weight: bold; font-size: 11px; margin-bottom: 12px; letter-spacing: 3px;">
+          ANALYSIS: <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">Synthesizing data...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">BACK</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">MOLECULAR ANALYSIS</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--secondary);">0/10</h1>
+        <p id="remarkText" style="font-style: italic; margin-bottom: 25px;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; margin-top:20px; background: var(--primary); border: none;" onclick="location.reload()">RE-TAKE EVALUATION</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audio = document.getElementById("myAudio");
+    document.getElementById("start-btn").addEventListener("click", () => {
+        document.getElementById("start-screen").style.display = "none";
+        if (document.getElementById("enable-sound").checked) {
+            audio.currentTime = 125; audio.play();
+        }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is Momo Yaoyorozu's Hero Name?", a: "Creati", o: ["Creati", "Creation Queen", "Lipid Lady", "The Maker"] },
+        { q: "What is the name of her Quirk?", a: "Creation", o: ["Synthesis", "Creation", "Matter Maker", "Lipid Shift"] },
+        { q: "What does Momo consume to power her Quirk?", a: "Fat cells (Lipids)", o: ["Sugar", "Fat cells (Lipids)", "Protein", "Water"] },
+        { q: "Momo entered U.A. High through which method?", a: "Official Recommendation", o: ["General Entrance Exam", "Official Recommendation", "Transfer Student", "Support Course Test"] },
+        { q: "What is Momo's rank in Class 1-A's grades?", a: "1st", o: ["1st", "2nd", "3rd", "5th"] },
+        { q: "Which Pro Hero did Momo intern with?", a: "Uwabami", o: ["Uwabami", "Fat Gum", "Mt. Lady", "Ryukyu"] },
+        { q: "Who did Momo team up with to fight Eraser Head?", a: "Shoto Todoroki", o: ["Tenya Iida", "Shoto Todoroki", "Fumikage Tokoyami", "Kyoka Jiro"] },
+        { q: "Momo is the Vice President of Class 1-A. Who is the President?", a: "Tenya Iida", o: ["Izuku Midoriya", "Tenya Iida", "Katsuki Bakugo", "Mina Ashido"] },
+        { q: "What is Momo's favorite thing?", a: "Books & Encyclopedias", o: ["Tea", "Books & Encyclopedias", "Fashion", "Math"] },
+        { q: "What color is Momo's hero costume primarily?", a: "Red", o: ["Red", "White", "Gold", "Black"] },
+        { q: "What is Momo's birthday?", a: "September 23rd", o: ["September 23rd", "January 1st", "June 15th", "December 10th"] },
+        { q: "During Kamino, Momo created a device to do what?", a: "Track the Nomu", o: ["Destroy the warehouse", "Track the Nomu", "Shield the students", "Translate languages"] },
+        { q: "What is Momo's height?", a: "173 cm", o: ["165 cm", "170 cm", "173 cm", "178 cm"] },
+        { q: "Who was Momo's primary rival in the Joint Training Arc?", a: "Itsuka Kendo", o: ["Itsuka Kendo", "Pony Tsunotori", "Setsuna Tokage", "Kinoko Komori"] },
+        { q: "What is a limitation of her Quirk regarding organic matter?", a: "She cannot create living things", o: ["She cannot create living things", "She cannot create food", "She cannot create wood", "She cannot create liquids"] },
+        { q: "What number does 'Yaoyorozu' represent?", a: "Eight Million", o: ["One Hundred", "Ten Thousand", "Eight Million", "Infinite"] },
+        { q: "What is her ultimate move used against Kendo?", a: "Yaoyorozu's Lucky Bag", o: ["Yaoyorozu's Lucky Bag", "Creation Cannon", "Lipid Burst", "Tactical Synthesis"] },
+        { q: "What is Momo's blood type?", a: "A", o: ["A", "B", "O", "AB"] },
+        { q: "Momo often hosts study sessions at her house. Her family status is?", a: "Extremely wealthy", o: ["Middle class", "Extremely wealthy", "Pro Hero legacy", "Government officials"] },
+        { q: "To create an object, Momo must understand its what?", a: "Atomic structure", o: ["Atomic structure", "Market price", "Color and weight", "History"] }
+    ];
+
+    let highScore = localStorage.getItem("momo_high_score") || 0;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "FINISH EVALUATION" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { showResults(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let removed = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && removed < 2) {
+                b.classList.add("hidden");
+                removed++;
+            }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function showResults() {
+        let score = 0;
+        const review = document.getElementById("reviewList");
+        review.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            review.innerHTML += `<div style="margin-bottom:10px; border-left:4px solid ${isCorrect ? 'var(--secondary)' : 'var(--primary)'}; padding-left:10px;">
+                <div style="font-size:13px; font-weight:bold;">${q.q}</div>
+                <div style="font-size:11px; color:var(--secondary)">DATA: ${q.a}</div>
+            </div>`;
+        });
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("momo_high_score", highScore);
+        }
+
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerHTML = `${score}/10 <span style="font-size:16px; color:white; display:block;">HIGHEST ACHIEVEMENT: ${highScore}/10</span>`;
+        document.getElementById("remarkText").innerText = score > 7 ? "A PERFECT STRATEGIC VICTORY!" : "CONTINUE YOUR STUDIES!";
+    }
+  </script>
+</body>
+</html>

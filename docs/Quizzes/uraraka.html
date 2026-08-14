@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Ochaco Uraraka</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #ff69b4; /* Uravity Pink */
+      --secondary: #1a1a20; /* Dark Charcoal */
+      --accent: #ff85c0;
+      --text: #e0e0e0; /* Light Silver Text */
+      --glass: rgba(20, 20, 25, 0.96); /* Dark Glass */
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: #0a0a0c; font-family: 'Inter', sans-serif;
+      color: var(--text); overflow: hidden;
+    }
+
+    /* Video & Overlay - Reduced Brightness */
+    #bgVideo { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: contrast(1) brightness(0.4); }
+    .overlay { position: fixed; inset: 0; background: linear-gradient(135deg, rgba(10, 5, 15, 0.65) 0%, rgba(0, 0, 0, 0.75) 100%); z-index: 2; }
+
+    .progress-container { position: fixed; top: 0; width: 100%; height: 6px; z-index: 10; background: rgba(0,0,0,0.3); }
+    #progressBar { height: 100%; width: 0%; background: var(--primary); box-shadow: 0 0 15px var(--primary); transition: 0.4s ease-in-out; }
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    .site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+    .circle-btn {
+      width: 45px; height: 45px; border-radius: 50%; background: #222; color: var(--primary);
+      border: 1px solid var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 18px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+    .circle-btn:hover { background: var(--primary); color: white; transform: translateY(-3px); }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); border: 2px solid rgba(255, 105, 180, 0.2);
+      width: 90%; max-width: 600px; padding: 40px; border-radius: 25px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); text-align: center;
+    }
+
+    #questionText { font-weight: 600; font-size: 22px; line-height: 1.4; color: #fff; margin-bottom: 30px; min-height: 60px; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: #1a1a20; border: 1px solid #333;
+      padding: 16px; color: #bbb; cursor: pointer; transition: 0.3s;
+      font-weight: 500; border-radius: 15px; font-size: 15px;
+    }
+    .option-btn:hover { border-color: var(--primary); background: #252530; color: white; }
+    .option-btn.selected { background: var(--primary) !important; color: white !important; border-color: #fff; transform: scale(1.02); }
+    .option-btn.hidden { opacity: 0; pointer-events: none; transform: scale(0.9); }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+    
+    .nav-btn { background: none; border: 1px solid var(--primary); color: var(--primary); padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: 700; text-transform: uppercase; transition: 0.3s; }
+    .nav-btn:hover:not(:disabled) { background: var(--primary); color: white; }
+    .nav-btn:disabled { opacity: 0.1; cursor: default; }
+
+    .lifeline-btn { 
+        background: transparent; border: 1px solid #444; padding: 8px 18px; 
+        color: #888; cursor: pointer; font-size: 11px; font-weight: 700; border-radius: 50px;
+    }
+    .lifeline-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+
+    #start-screen {
+      position: fixed; inset: 0; background: #000; z-index: 999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    }
+    #start-screen h1 { font-size: 3rem; color: var(--primary); text-transform: uppercase; margin: 0; letter-spacing: 4px; }
+    #start-screen p { color: #666; margin-bottom: 40px; font-weight: 500; }
+
+    #start-btn {
+      padding: 18px 70px; background: transparent; border: 1px solid var(--primary);
+      color: var(--primary); font-size: 18px; border-radius: 50px; cursor: pointer; transition: 0.4s; font-weight: 800;
+    }
+    #start-btn:hover { background: var(--primary); color: white; box-shadow: 0 0 20px var(--primary); }
+
+    .review-area { max-height: 220px; overflow-y: auto; background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 15px; margin: 20px 0; text-align: left; border: 1px solid #222; }
+    .review-item { margin-bottom: 12px; padding-left: 12px; }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1 style="color: var(--primary);">URAVITY</h1>
+    <p style="color: white;">Calibrating Gravity Fields...</p>
+    <label style="margin-bottom: 30px; cursor: pointer; color: white; font-size: 14px; user-select: none;">
+      <input type="checkbox" id="enable-sound"> Sync Audio Stream
+    </label>
+    <button id="start-btn">BEGIN EXAM</button>
+  </div>
+
+  <audio id="myAudio" loop><source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" /></audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/ochaco_uraraka_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="font-size: 12px; color: var(--primary); font-weight: 800; margin-bottom: 10px; letter-spacing: 2px;">
+          FLIGHT CHECK: <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">Preparing lift-off...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">PREV</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">RELEASE WEIGHT</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 65px; margin: 0; color: var(--primary);">0</h1>
+        <p id="remarkText" style="font-weight: 700; color: #888;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="nav-btn" style="width:100%;" onclick="location.reload()">RE-ATTEMPT TRIAL</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audio = document.getElementById("myAudio");
+    
+    document.getElementById("start-btn").addEventListener("click", () => {
+        document.getElementById("start-screen").style.display = "none";
+        const soundEnabled = document.getElementById("enable-sound").checked;
+        if (soundEnabled) {
+            audio.currentTime = 125; 
+            audio.play().catch(e => console.log("Audio block prevented."));
+        }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is Ochaco's Quirk?", a: "Zero Gravity", o: ["Zero Gravity", "Float", "Anti-Gravity", "Weightless"] },
+        { q: "What happens if she exceeds her weight limit?", a: "She gets nauseous/vomits", o: ["She faints", "She gets nauseous/vomits", "She floats away", "She loses her memory"] },
+        { q: "What is Ochaco's Hero Name?", a: "Uravity", o: ["Uravity", "Pinky", "Gravity Girl", "Floatie"] },
+        { q: "Why did she want to become a hero?", a: "To earn money for her parents", o: ["To be famous", "To earn money for her parents", "To follow Deku", "To fight villains"] },
+        { q: "What is her birthday?", a: "December 27th", o: ["December 27th", "January 1st", "April 10th", "June 25th"] },
+        { q: "Who was her opponent in the Sports Festival tournament?", a: "Katsuki Bakugo", o: ["Izuku Midoriya", "Katsuki Bakugo", "Tenya Iida", "Shoto Todoroki"] },
+        { q: "Which martial arts style did she learn during her internship?", a: "Gunhead Martial Arts", o: ["Karate", "Gunhead Martial Arts", "Judo", "Wrestling"] },
+        { q: "What is her favorite food?", a: "Mochi", o: ["Mochi", "Ramen", "Sushi", "Cake"] },
+        { q: "What color is her hair?", a: "Brown", o: ["Brown", "Pink", "Black", "Auburn"] },
+        { q: "Where is she from?", a: "Mie Prefecture", o: ["Tokyo", "Mie Prefecture", "Osaka", "Kyoto"] },
+        { q: "What is her blood type?", a: "B", o: ["A", "B", "O", "AB"] },
+        { q: "What is her height?", a: "156 cm", o: ["150 cm", "156 cm", "160 cm", "165 cm"] },
+        { q: "Who did she team up with in the Cavalry Battle?", a: "Midoriya, Tokoyami, and Hatsume", o: ["Midoriya, Tokoyami, and Hatsume", "Iida, Todoroki, and Yaoyorozu", "Bakugo, Kirishima, and Ashido", "Tsuyu, Mineta, and Shoji"] },
+        { q: "What is the name of her ultimate move using rubble?", a: "Meteor Fafrotskies", o: ["Meteor Shower", "G-Force Slam", "Meteor Fafrotskies", "Orbit Strike"] },
+        { q: "What are the pads on her fingertips used for?", a: "To activate her Quirk", o: ["To activate her Quirk", "To grip things better", "To sense vibrations", "Decoration"] },
+        { q: "Which hero did she intern with after the Sports Festival?", a: "Gunhead", o: ["Gunhead", "Ryukyu", "Uwabami", "Fat Gum"] },
+        { q: "What is her seat number in Class 1-A?", a: "5", o: ["1", "5", "10", "15"] },
+        { q: "Who is her best female friend?", a: "Tsuyu Asui", o: ["Tsuyu Asui", "Momo Yaoyorozu", "Mina Ashido", "Kyoka Jiro"] },
+        { q: "What does she carry in her hero costume's belt?", a: "Nausea medicine", o: ["First aid kit", "Nausea medicine", "Snacks", "Grappling hook"] },
+        { q: "In the Final Exams, who was her teacher opponent?", a: "Thirteen", o: ["Thirteen", "Aizawa", "Present Mic", "Midnight"] }
+    ];
+
+    let highScore = localStorage.getItem("ochaco_high_score") || 0;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "FINISH" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { showResults(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let hiddenCount = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && hiddenCount < 2) {
+                b.classList.add("hidden");
+                hiddenCount++;
+            }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function showResults() {
+        let score = 0;
+        const review = document.getElementById("reviewList");
+        review.innerHTML = "";
+        
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            review.innerHTML += `
+                <div class="review-item" style="border-left: 3px solid ${isCorrect ? 'var(--primary)' : '#444'}">
+                    <div style="font-size: 14px; font-weight: 600;">${q.q}</div>
+                    <div style="font-size: 12px; color: ${isCorrect ? 'var(--primary)' : '#e74c3c'}">
+                        ${isCorrect ? 'Correct!' : 'Answer: ' + q.a}
+                    </div>
+                </div>`;
+        });
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("ochaco_high_score", highScore);
+        }
+
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerHTML = `${score}/10 <span style="font-size:18px; color:#555; display:block;">BEST: ${highScore}/10</span>`;
+        document.getElementById("remarkText").innerText = score > 7 ? "PLUS ULTRA! YOU'RE FLOATING!" : "KEEP REACHING FOR THE STARS!";
+    }
+  </script>
+</body>
+</html>

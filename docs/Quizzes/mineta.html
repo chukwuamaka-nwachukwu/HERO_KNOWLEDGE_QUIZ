@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Mineta</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #8e44ad; /* Grape Purple */
+      --secondary: #f1c40f; /* Hero Yellow */
+      --glass: rgba(40, 10, 60, 0.85);
+      --border: rgba(142, 68, 173, 0.6);
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: #1a0525; font-family: 'Inter', sans-serif;
+      color: white; overflow: hidden;
+    }
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: saturate(1.1); }
+    .overlay { position: fixed; inset: 0; background: radial-gradient(circle, rgba(20,20,20,0.7) 0%, rgba(5,5,5,0.95) 100%); z-index: 2; }
+
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 10px; z-index: 10; background: rgba(0,0,0,0.4); }
+    #progressBar { 
+      height: 100%; width: 0%; 
+      background: linear-gradient(90deg, var(--primary), #dcdde1); 
+      box-shadow: 0 0 20px var(--primary);
+      border-radius: 0 10px 10px 0;
+      transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    }
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    
+    .circle-btn {
+      width: 45px; height: 45px; border-radius: 50%; background: white; color: #1a0525;
+      border: 3px solid var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 18px; font-weight: bold;
+    }
+    .circle-btn:hover { transform: scale(1.1) rotate(180deg); background: var(--secondary); color: black; }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); backdrop-filter: blur(20px); border: 3px solid var(--border);
+      width: 90%; max-width: 620px; border-radius: 40px; padding: 40px; text-align: center;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+    }
+
+    #questionText { font-size: 22px; font-weight: 700; margin-bottom: 25px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: rgba(255, 255, 255, 0.07); border: 2px solid var(--border);
+      padding: 16px; border-radius: 50px; color: white; cursor: pointer; transition: 0.3s; 
+      font-weight: 600; font-size: 15px;
+    }
+    .option-btn:hover { background: rgba(142, 68, 173, 0.3); border-color: var(--secondary); transform: scale(1.02); }
+    .option-btn.selected { background: var(--secondary) !important; color: #000 !important; border-color: white; box-shadow: 0 0 15px var(--secondary); }
+    .option-btn.hidden { opacity: 0; pointer-events: none; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+    
+    .nav-btn {
+      background: none; border: 2px solid var(--secondary); color: var(--secondary);
+      padding: 10px 25px; border-radius: 50px; cursor: pointer; transition: 0.3s;
+      font-weight: 800; text-transform: uppercase;
+    }
+    .nav-btn:hover:not(:disabled) { background: var(--secondary); color: #000; }
+    .nav-btn:disabled { opacity: 0.2; }
+
+    .lifeline-btn { 
+        background: var(--primary); border: none; padding: 10px 20px; 
+        border-radius: 50px; color: white; cursor: pointer; font-size: 11px;
+        font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
+        box-shadow: 0 4px 0 #5e3370;
+    }
+    .lifeline-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #5e3370; }
+
+    #start-screen {
+      position: fixed; inset: 0; background: #000; color: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
+    }
+    #start-screen h1 { font-size: 60px; margin: 0; color: var(--secondary); -webkit-text-stroke: 1px var(--primary); }
+
+    #start-btn {
+      padding: 20px 70px; background: var(--primary); border: none;
+      border-radius: 50px; font-size: 22px; color: white; font-weight: 900; cursor: pointer; transition: 0.3s;
+      box-shadow: 0 8px 0 #5e3370;
+    }
+    #start-btn:hover { transform: translateY(-3px); box-shadow: 0 11px 0 #5e3370; background: #9b59b6; }
+
+    .review-area { max-height: 220px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 20px; border: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>GRAPE JUICE</h1>
+    <p style="letter-spacing: 4px; font-weight: bold; margin-bottom: 35px; color: var(--primary);">POP OFF KNOWLEDGE TEST</p>
+    <label style="margin-bottom: 25px; cursor: pointer;"><input type="checkbox" id="enable-sound"> SYNC AUDIO SPHERES</label>
+    <button id="start-btn">BEGIN QUIZ</button>
+  </div>
+
+  <audio id="myAudio" loop><source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" /></audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/mineta_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="color: var(--secondary); font-weight: 900; font-size: 12px; margin-bottom: 10px; letter-spacing: 2px;">
+          SPHERE COUNT: <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">Preparing spheres...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">BACK</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">POP OFF (50/50)</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--secondary);">0/10</h1>
+        <p id="remarkText" style="font-weight: bold; margin-bottom: 20px;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; margin-top:20px; background: var(--secondary); color: black;" onclick="location.reload()">RE-ATTEMPT (FOR THE GIRLS!)</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audio = document.getElementById("myAudio");
+    document.getElementById("start-btn").addEventListener("click", () => {
+        document.getElementById("start-screen").style.display = "none";
+        if (document.getElementById("enable-sound").checked) {
+            audio.currentTime = 125; audio.play();
+        }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is Mineta's Hero Name?", a: "Grape Juice", o: ["Grape Juice", "Sticky King", "Purple Orb", "Small Might"] },
+        { q: "What is the name of his Quirk?", a: "Pop Off", o: ["Pop Off", "Sticky Balls", "Grape Rush", "Bounce Back"] },
+        { q: "Where does Mineta's Quirk grow from?", a: "His head", o: ["His head", "His hands", "His back", "His elbows"] },
+        { q: "What happens if Mineta pulls off too many spheres too fast?", a: "He starts bleeding", o: ["He passes out", "He starts bleeding", "He gets a headache", "They stop being sticky"] },
+        { q: "Why did Mineta choose to become a hero?", a: "To be popular with girls", o: ["To save lives", "To earn money", "To be popular with girls", "To prove he's strong"] },
+        { q: "What is Mineta's birthday?", a: "October 8th", o: ["October 8th", "July 7th", "May 20th", "December 1st"] },
+        { q: "What is Mineta's blood type?", a: "B", o: ["A", "B", "O", "AB"] },
+        { q: "During USJ, who did Mineta team up with in the flood zone?", a: "Deku and Tsuyu", o: ["Deku and Tsuyu", "Bakugo and Kirishima", "Kaminari and Jiro", "Momo and Todoroki"] },
+        { q: "Which teacher did Mineta face during the Final Exams?", a: "Midnight", o: ["Midnight", "Eraser Head", "Present Mic", "All Might"] },
+        { q: "What is the name of Mineta's technique where he strings balls together?", a: "Grape Vine", o: ["Grape Chain", "Grape Vine", "Sticky String", "Purple Rope"] },
+        { q: "How does Mineta react to his own spheres?", a: "He bounces off them", o: ["He gets stuck", "He bounces off them", "He absorbs them", "They pass through him"] },
+        { q: "What is Mineta's height?", a: "108 cm", o: ["100 cm", "108 cm", "115 cm", "120 cm"] },
+        { q: "In the Sports Festival, how did he travel during the obstacle race?", a: "Stuck to Momo's back", o: ["Riding a robot", "Stuck to Momo's back", "Running normally", "Bouncing on his spheres"] },
+        { q: "What is Mineta's strategic intelligence score in the official guide?", a: "4/5 (B-Rank)", o: ["1/5 (E-Rank)", "2/5 (D-Rank)", "4/5 (B-Rank)", "5/5 (S-Rank)"] },
+        { q: "What is Mineta's favorite thing?", a: "Girls", o: ["Girls", "Grapes", "Video games", "Comic books"] },
+        { q: "Which student does Mineta usually annoy the most?", a: "Tsuyu Asui", o: ["Tsuyu Asui", "Mina Ashido", "Momo Yaoyorozu", "Kyoka Jiro"] },
+        { q: "Stickiness of his spheres is dependent on what?", a: "His health/condition", o: ["What he ate", "His health/condition", "The weather", "His mood"] },
+        { q: "What rank did he finish in the U.A. Entrance Exam?", a: "9th", o: ["5th", "9th", "15th", "19th"] },
+        { q: "What is the color of Mineta's hero costume cape?", a: "Purple", o: ["Yellow", "Purple", "White", "Green"] },
+        { q: "What kind of juice did he offer to Bakugo while he was in the hospital?", a: "Melon Soda", o: ["Grape Juice", "Apple Juice", "Melon Soda", "Orange Juice"] }
+    ];
+
+    let highScore = localStorage.getItem("mineta_high_score") || 0;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "FINISH EXAM" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { showResults(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let removed = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && removed < 2) {
+                b.classList.add("hidden");
+                removed++;
+            }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function showResults() {
+        let score = 0;
+        const review = document.getElementById("reviewList");
+        review.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            review.innerHTML += `<div style="margin-bottom:10px; border-left:4px solid ${isCorrect ? 'var(--primary)' : 'var(--secondary)'}; padding-left:10px;">
+                <div style="font-size:13px; font-weight:bold;">${q.q}</div>
+                <div style="font-size:11px; color:var(--primary)">PICK: ${q.a}</div>
+            </div>`;
+        });
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("mineta_high_score", highScore);
+        }
+
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerHTML = `${score}/10 <span style="font-size:16px; color:white; display:block;">JUICIEST RECORD: ${highScore}/10</span>`;
+        document.getElementById("remarkText").innerText = score > 7 ? "STILL COOL UNDER PRESSURE!" : "KEEP CLIMBING!";
+    }
+  </script>
+</body>
+</html>

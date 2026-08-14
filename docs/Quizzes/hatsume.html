@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Mei Hatsume</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #ff69b4; /* Gadget Pink */
+      --secondary: #f1c40f; /* Warning Yellow */
+      --dark: #0a0a0a;
+      --glass: rgba(15, 15, 15, 0.95);
+      --border: rgba(255, 105, 180, 0.3);
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: var(--dark); font-family: 'Inter', sans-serif;
+      color: white; overflow: hidden;
+    }
+
+    /* Workshop Blueprint Grid Overlay */
+    body::before {
+      content: ""; position: fixed; inset: 0;
+      background-image: 
+        linear-gradient(rgba(255, 105, 180, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 105, 180, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px; z-index: 3; pointer-events: none;
+    }
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.3) grayscale(0.5); }
+    
+    .overlay { 
+        position: fixed; inset: 0; 
+        background: radial-gradient(circle, rgba(20,20,20,0.4) 0%, rgba(5,5,5,0.95) 100%); 
+        z-index: 2; 
+    }
+
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 8px; z-index: 10; background: #222; }
+    #progressBar { 
+        height: 100%; width: 0%; 
+        background: repeating-linear-gradient(45deg, var(--secondary), var(--secondary) 10px, #000 10px, #000 20px); 
+        transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    }
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    
+    .circle-btn {
+      width: 45px; height: 45px; border-radius: 8px; background: #fff; color: #000;
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 18px; font-weight: bold;
+    }
+    .circle-btn:hover { background: var(--primary); color: white; transform: rotate(180deg); box-shadow: 0 0 20px var(--primary); }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); border: 2px solid var(--border);
+      width: 90%; max-width: 650px; border-radius: 0px; padding: 45px; text-align: center;
+      box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,105,180,0.1);
+      position: relative;
+    }
+
+    /* Corner Screws Aesthetic */
+    .quiz-card::before { content: "⊕"; position: absolute; top: 10px; left: 10px; color: var(--border); font-size: 12px; }
+    .quiz-card::after { content: "⊕"; position: absolute; bottom: 10px; right: 10px; color: var(--border); font-size: 12px; }
+
+    #questionText { font-size: 22px; font-weight: 300; margin-bottom: 35px; line-height: 1.4; letter-spacing: 0.5px; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: rgba(255,255,255,0.02); border: 1px solid #333; padding: 18px; 
+      border-radius: 4px; color: #888; cursor: pointer; transition: 0.2s; font-size: 15px;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .option-btn:hover { border-color: var(--primary); color: white; background: rgba(255, 105, 180, 0.05); }
+    .option-btn.selected { background: var(--primary) !important; color: white !important; border-color: var(--primary); font-weight: bold; }
+    .option-btn.hidden { opacity: 0; pointer-events: none; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; border-top: 1px solid #222; padding-top: 20px; }
+    
+    .nav-btn {
+      background: none; border: none; color: #555; padding: 10px 20px; 
+      cursor: pointer; transition: 0.3s; font-size: 12px; font-weight: bold; letter-spacing: 2px;
+    }
+    .nav-btn:hover:not(:disabled) { color: var(--primary); }
+    .nav-btn:disabled { opacity: 0.1; }
+
+    .lifeline-btn { 
+        background: transparent; border: 1px solid var(--secondary); padding: 8px 18px; 
+        border-radius: 0px; color: var(--secondary); cursor: pointer; font-size: 11px; font-weight: bold;
+    }
+    .lifeline-btn:hover:not(:disabled) { background: var(--secondary); color: black; }
+
+    #start-screen {
+      position: fixed; inset: 0; background: #050505; color: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
+    }
+    #start-screen h1 { font-size: 45px; color: var(--primary); letter-spacing: 10px; margin: 0; }
+    #start-screen p { font-size: 12px; opacity: 0.4; margin-bottom: 40px; letter-spacing: 4px; }
+
+    #start-btn {
+      padding: 18px 60px; background: transparent; border: 1px solid var(--primary);
+      font-size: 18px; color: var(--primary); cursor: pointer; transition: 0.4s;
+    }
+    #start-btn:hover { background: var(--primary); color: white; box-shadow: 0 0 30px rgba(255, 105, 180, 0.4); }
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+    .review-area { max-height: 220px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 4px; border: 1px solid #222; }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>HATSUME MEI</h1>
+    <p>SUPPORT DEPARTMENT LOGS</p>
+    <label style="margin-bottom: 25px; cursor: pointer; font-size: 11px; opacity: 0.7;">
+        <input type="checkbox" id="enable-sound"> SYNC AUDIO DIAGNOSTICS
+    </label>
+    <button id="start-btn">BOOT SYSTEM</button>
+  </div>
+
+  <audio id="myAudio" loop>
+    <source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" />
+  </audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/mei_hatsume_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="color: var(--secondary); font-size: 11px; margin-bottom: 10px; letter-spacing: 3px; font-weight: bold;">
+          DIAGNOSTIC TEST: <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">Calibrating "Baby" sensors...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">PREV</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">RECALIBRATE (50/50)</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--primary);">0/10</h1>
+        <p id="remarkText" style="margin-bottom: 20px; font-weight: bold; color: var(--secondary);"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; margin-top:20px; border-color: var(--primary); color: var(--primary);" onclick="location.reload()">RE-DEVELOP (RETRY)</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    const audio = document.getElementById("myAudio");
+    const startBtn = document.getElementById("start-btn");
+
+    startBtn.addEventListener("click", () => {
+        document.getElementById("start-screen").style.display = "none";
+        if (document.getElementById("enable-sound").checked) {
+            audio.currentTime = 125; audio.play();
+        }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is Mei Hatsume's Quirk?", a: "Zoom", o: ["Zoom", "Microscope", "Focus", "Vision Plus"] },
+        { q: "What does Mei affectionately call her inventions?", a: "My Babies", o: ["My Gadgets", "My Babies", "My Masterpieces", "Support Tools"] },
+        { q: "Which U.A. High department does Mei belong to?", a: "Support Department", o: ["Hero Department", "Support Department", "General Education", "Management"] },
+        { q: "How far can Mei's eyes zoom with her Quirk?", a: "5 kilometers", o: ["1 kilometer", "5 kilometers", "10 kilometers", "500 meters"] },
+        { q: "Who was Mei's opponent in the Sports Festival tournament?", a: "Tenya Iida", o: ["Izuku Midoriya", "Tenya Iida", "Katsuki Bakugo", "Shoto Todoroki"] },
+        { q: "What was Mei's true goal during her fight with Iida?", a: "To show off her gadgets", o: ["To win the festival", "To show off her gadgets", "To humiliate Iida", "To join Class 1-A"] },
+        { q: "Which hero does Mei work closely with to repair Deku's suit?", a: "Power Loader", o: ["Eraser Head", "Power Loader", "Cementoss", "All Might"] },
+        { q: "What is Mei's blood type?", a: "O", o: ["A", "B", "O", "AB"] },
+        { q: "What are the crosshair-like designs in Mei's eyes?", a: "Part of her Quirk's appearance", o: ["Support lenses", "Tattoos", "Part of her Quirk's appearance", "Scars"] },
+        { q: "Which Support item did Mei give to Deku for his 'Shoot Style'?", a: "Iron Sole Leggings", o: ["Air Force Gloves", "Iron Sole Leggings", "Jet Boots", "Power Bracers"] },
+        { q: "Mei's birthday is in which month?", a: "April", o: ["April", "July", "September", "December"] },
+        { q: "Mei is famously known for ignoring what?", a: "Personal space", o: ["Rules", "Personal space", "Sleep", "Food"] },
+        { q: "During the Cavalry Battle, who did Mei team up with?", a: "Midoriya, Uraraka, and Tokoyami", o: ["Midoriya, Uraraka, and Tokoyami", "Bakugo, Kirishima, and Ashido", "Todoroki, Iida, and Yaoyorozu", "Shinso and Class 1-B"] },
+        { q: "What color is Mei Hatsume's hair?", a: "Pink", o: ["Pink", "Red", "Orange", "Purple"] },
+        { q: "Why does Mei's lab often explode?", a: "She overclocks her inventions", o: ["She is careless", "She overclocks her inventions", "Monoma sabotages her", "It's a testing requirement"] },
+        { q: "What is the name of the 'Baby' that allows for high-speed flight?", a: "Jet Pack", o: ["Jet Pack", "Hover Boots", "Wing Suit", "Sky Crawler"] },
+        { q: "How much sleep does Mei typically get when working on a project?", a: "Almost none", o: ["Full 8 hours", "Almost none", "4 hours", "She sleeps in the lab"] },
+        { q: "What does Mei use to hold her hair back while working?", a: "Steampunk Goggles", o: ["A pink ribbon", "Steampunk Goggles", "A tool belt", "A welding mask"] },
+        { q: "Mei invited which class 1-A student to try her 'Power Suit'?", a: "Izuku Midoriya", o: ["Izuku Midoriya", "Minoru Mineta", "Denki Kaminari", "Mina Ashido"] },
+        { q: "What is the motto of the Support Department Mei lives by?", a: "Create to Help", o: ["Create to Help", "Innovation First", "Babies are Best", "Plus Ultra Inventions"] }
+    ];
+
+    let highScore = localStorage.getItem("hatsume_high_score") || 0;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "DECODE" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { finish(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let count = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && count < 2) { b.classList.add("hidden"); count++; }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function finish() {
+        let score = 0;
+        const review = document.getElementById("reviewList");
+        review.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            review.innerHTML += `<div style="margin-bottom:12px; border-left:3px solid ${isCorrect ? 'var(--primary)' : 'var(--secondary)'}; padding-left:15px;">
+                <div style="font-size:13px;">${q.q}</div>
+                <div style="font-size:11px; color:var(--primary)">Baby Output: ${q.a}</div>
+            </div>`;
+        });
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("hatsume_high_score", highScore);
+        }
+
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerHTML = score + "/10 <div style='font-size:14px; color:white;'>BEST DATA: " + highScore + "/10</div>";
+        document.getElementById("remarkText").innerText = score > 7 ? "MY BABIES ARE PERFECT!" : "RESEARCH & DEVELOPMENT REQUIRED!";
+    }
+</script>
+</body>
+</html>

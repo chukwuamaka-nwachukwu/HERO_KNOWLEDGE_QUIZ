@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Tamaki Amajiki</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #d4af37; /* Pale Gold Armor */
+      --secondary: #2c2c54; /* Indigo Cloak blue */
+      --bg: #0b0b15;
+      --glass: rgba(15, 15, 30, 0.9);
+      --border: #3a3a5a;
+      --text: #e0e0e0;
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: var(--bg); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text); overflow: hidden;
+    }
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: grayscale(0.4) brightness(0.2); }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent, #000); z-index: 2; }
+
+    /* Subtle Progress Bar */
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 5px; z-index: 10; background: rgba(255,255,255,0.05); }
+    #progressBar { height: 100%; width: 0%; background: var(--primary); transition: 0.5s; box-shadow: 0 0 15px var(--primary); }
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    
+    .circle-btn {
+      width: 45px; height: 45px; border-radius: 50%; background: rgba(0,0,0,0.5); color: var(--primary);
+      border: 1px solid var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 18px;
+    }
+    .circle-btn:hover { background: var(--primary); color: black; transform: scale(1.1); }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); border: 1px solid var(--border); border-top: 5px solid var(--primary);
+      width: 90%; max-width: 600px; border-radius: 12px; padding: 40px; text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+
+    #questionText { font-size: 22px; font-weight: 300; margin-bottom: 25px; min-height: 60px; line-height: 1.4; color: #fff; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      padding: 16px; border-radius: 6px; color: #ccc; cursor: pointer; transition: 0.3s; font-size: 15px;
+    }
+    .option-btn:hover { border-color: var(--primary); background: rgba(212, 175, 55, 0.05); color: #fff; }
+    .option-btn.selected { background: var(--primary) !important; color: black !important; font-weight: 700; border-color: #fff; }
+    .option-btn.hidden { opacity: 0; pointer-events: none; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+    
+    .nav-btn {
+      background: none; border: 1px solid #555; color: #aaa;
+      padding: 10px 25px; border-radius: 4px; cursor: pointer; transition: 0.3s; font-size: 13px; letter-spacing: 1px;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+    .nav-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+    .lifeline-btn { 
+        background: var(--secondary); border: none; padding: 10px 20px; 
+        border-radius: 4px; color: var(--primary); cursor: pointer; font-size: 11px; font-weight: bold;
+        letter-spacing: 1px; transition: 0.3s;
+    }
+    .lifeline-btn:hover:not(:disabled) { filter: brightness(1.2); box-shadow: 0 0 10px var(--secondary); }
+
+    /* Start Screen */
+    #start-screen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #05050a; color: #fff; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; z-index: 999; transition: opacity 0.5s;
+    }
+    #start-screen h1 { font-size: 48px; color: var(--primary); letter-spacing: 12px; margin-bottom: 5px; }
+    #start-screen p { font-style: italic; opacity: 0.6; margin-bottom: 40px; }
+    
+    #start-btn {
+      padding: 18px 50px; background: transparent; border: 1px solid var(--primary);
+      font-size: 18px; color: var(--primary); cursor: pointer; transition: 0.4s;
+    }
+    #start-btn:hover { background: var(--primary); color: #000; letter-spacing: 3px; }
+
+    .review-area { max-height: 200px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>SUNEATER</h1>
+    <p>"I need to manifest... enough courage."</p>
+    <label style="margin-bottom: 30px; cursor: pointer; font-size: 14px; opacity: 0.8;">
+      <input type="checkbox" id="enable-sound"> Sync Courage (Audio)
+    </label>
+    <button id="start-btn">BEGIN EVALUATION</button>
+  </div>
+
+  <audio id="myAudio" loop>
+    <source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" />
+  </audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+
+  <video id="bgVideo" autoplay muted loop playsinline>
+    <source src="../Static/amajiki_gid.mp4" type="video/mp4">
+  </video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="color: var(--primary); letter-spacing: 3px; font-size: 11px; margin-bottom: 10px; font-weight: bold;">
+          STAMINA: <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">...</h2>
+        
+        <div class="options-grid" id="optionsGrid"></div>
+
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">BACK</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">MANIFEST: OCTOPUS (50/50)</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 55px; margin: 0; color: var(--primary);">0/10</h1>
+        <p id="remarkText" style="margin-bottom: 20px; font-weight: bold;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; margin-top:20px; text-align: center;" onclick="location.reload()">RE-ATTEMPT (FOR FAT GUM)</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    const audio = document.getElementById("myAudio");
+    const startBtn = document.getElementById("start-btn");
+
+    startBtn.addEventListener("click", () => {
+        document.getElementById("start-screen").style.opacity = "0";
+        setTimeout(() => { document.getElementById("start-screen").style.display = "none"; }, 500);
+        if (document.getElementById("enable-sound").checked) {
+            audio.currentTime = 125; audio.play();
+        }
+        init();
+    });
+
+    // --- FULL 20 QUESTION DATABASE ---
+    const allQuestions = [
+        { q: "What is Tamaki Amajiki's hero name?", a: "Suneater", o: ["Suneater", "Manifest", "Indigo", "Tentacle Hero"] },
+        { q: "What is the name of his Quirk?", a: "Manifest", o: ["Manifest", "Consumption", "Chimera", "Organic Shift"] },
+        { q: "What is Tamaki's birthday?", a: "March 4th", o: ["March 4th", "January 12th", "July 15th", "December 1st"] },
+        { q: "What is Tamaki's height?", a: "177 cm", o: ["170 cm", "177 cm", "182 cm", "185 cm"] },
+        { q: "Which school does he attend?", a: "U.A. High School", o: ["U.A. High School", "Shiketsu High", "Ketsubutsu", "Isamu Academy"] },
+        { q: "Tamaki is part of the UA group known as...", a: "The Big 3", o: ["The Big 3", "The Vanguard", "Class 1-A", "The Elite 4"] },
+        { q: "Who is Tamaki's best friend since childhood?", a: "Mirio Togata", o: ["Mirio Togata", "Nejire Hado", "Fat Gum", "Kirishima"] },
+        { q: "Which hero agency did Tamaki intern with?", a: "Fat Gum Agency", o: ["Fat Gum Agency", "Nighteye Agency", "Endeavor Agency", "Ryukyu Agency"] },
+        { q: "Who is the third member of 'The Big 3' alongside Tamaki and Mirio?", a: "Nejire Hado", o: ["Mina Ashido", "Nejire Hado", "Tsuyu Asui", "Itsuka Kendo"] },
+        { q: "Which Class 1-A student interned alongside Tamaki?", a: "Eijiro Kirishima", o: ["Izuku Midoriya", "Katsuki Bakugo", "Eijiro Kirishima", "Shoto Todoroki"] },
+        { q: "What must Tamaki do to use his Quirk?", a: "Eat something", o: ["Drink water", "Eat something", "Meditate", "Touch the object"] },
+        { q: "What kind of food does he eat to manifest shells?", a: "Clams", o: ["Clams", "Shrimp", "Crab", "Snails"] },
+        { q: "Which food allows him to manifest powerful wings?", a: "Fried Chicken", o: ["Fried Chicken", "Duck", "Takoyaki", "Beef"] },
+        { q: "What animal's characteristics does he often manifest for capturing?", a: "Octopus", o: ["Octopus", "Eagle", "Centipede", "Squid"] },
+        { q: "What happens to his manifestations if he stops eating that food?", a: "They eventually fade", o: ["They stay forever", "They eventually fade", "They become permanent", "He loses his Quirk"] },
+        { q: "What does Tamaki do when he feels socially overwhelmed?", a: "Leans his head against a wall", o: ["Leans his head against a wall", "Covers his ears", "Runs away", "Activates his quirk"] },
+        { q: "Which hero gave Tamaki the inspiration for his hero name?", a: "Mirio Togata", o: ["Mirio Togata", "Fat Gum", "Nana Shimura", "Nighteye"] },
+        { q: "What are Tamaki's favorite things?", a: "Butterflies", o: ["Cats", "Butterflies", "Coffee", "Quiet places"] },
+        { q: "During the Shie Hassaikai arc, how many villains did Tamaki fight at once?", a: "3", o: ["1", "2", "3", "5"] },
+        { q: "What is Tamaki's ultimate move involving multiple food sources?", a: "Vast Hybrid", o: ["Chimera Soul", "Vast Hybrid", "Manifest All", "Total Suneater"] }
+    ];
+
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "FINISH PREP" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { calculateResults(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let count = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && count < 2) {
+                b.classList.add("hidden");
+                count++;
+            }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function calculateResults() {
+        let score = 0;
+        const reviewList = document.getElementById("reviewList");
+        reviewList.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            reviewList.innerHTML += `<div style="margin-bottom:10px; border-left:3px solid ${isCorrect ? 'var(--primary)' : '#ff4b4b'}; padding-left:12px;">
+                <div style="font-size:14px; color:#fff;">${q.q}</div>
+                <div style="font-size:12px; color:${isCorrect ? 'var(--primary)' : '#ff4b4b'}">Answer: ${q.a}</div>
+            </div>`;
+        });
+
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerText = score + "/10";
+        document.getElementById("remarkText").innerText = score > 7 ? "You've manifested the heart of a hero." : "Fat Gum says: Eat more, train harder!";
+    }
+</script>
+</body>
+</html>

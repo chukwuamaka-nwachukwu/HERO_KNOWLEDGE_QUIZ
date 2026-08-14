@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Tsuyu Asui</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #a6ff00; /* Neon Frog Green */
+      --secondary: #004422; /* Deep Swamp Green */
+      --accent: #00ffd5; /* Watery Teal */
+      --bg: #050a05;
+      --glass: rgba(5, 15, 5, 0.9);
+      --border: #1a331a;
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: var(--bg); font-family: 'Inter', sans-serif;
+      color: white; overflow: hidden;
+    }
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.3) saturate(0.8); }
+    
+    .overlay { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: radial-gradient(circle, rgba(0, 34, 0, 0.4), rgba(0, 0, 0, 0.75)); 
+      z-index: 2; 
+    }
+
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 6px; z-index: 10; background: rgba(255,255,255,0.05); }
+    #progressBar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--secondary), var(--primary)); transition: 0.5s; box-shadow: 0 0 15px var(--primary); }
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    
+    .circle-btn {
+      width: 45px; height: 45px; border-radius: 50%; background: rgba(0,0,0,0.7); color: var(--primary);
+      border: 1px solid var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 18px;
+    }
+    .circle-btn:hover { background: var(--primary); color: black; transform: scale(1.1); }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); border: 1px solid var(--border); border-top: 5px solid var(--primary);
+      width: 90%; max-width: 650px; border-radius: 15px; padding: 45px; text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    }
+
+    #questionText { font-size: 22px; font-weight: 300; margin-bottom: 30px; line-height: 1.5; color: #fff; letter-spacing: 0.5px; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+      padding: 16px; border-radius: 8px; color: #bbb; cursor: pointer; transition: 0.3s; font-size: 15px;
+    }
+    .option-btn:hover { border-color: var(--primary); color: white; background: rgba(166, 255, 0, 0.05); }
+    .option-btn.selected { background: var(--primary) !important; color: black !important; font-weight: bold; }
+    .option-btn.hidden { opacity: 0; pointer-events: none; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+    
+    .nav-btn {
+      background: none; border: 1px solid #333; color: #777;
+      padding: 10px 25px; border-radius: 4px; cursor: pointer; transition: 0.3s; font-size: 13px; font-weight: bold;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+    .nav-btn:disabled { opacity: 0.1; }
+
+    .lifeline-btn { 
+        background: var(--secondary); border: 1px solid var(--primary); padding: 10px 20px; 
+        border-radius: 4px; color: var(--primary); cursor: pointer; font-size: 11px; font-weight: bold;
+    }
+
+    #start-screen {
+      position: fixed; inset: 0; background: #020502; color: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
+    }
+    #start-screen h1 { font-size: 50px; color: var(--primary); letter-spacing: 12px; margin: 0; }
+    #start-screen p { font-style: italic; opacity: 0.5; margin-bottom: 40px; }
+
+    #start-btn {
+      padding: 18px 60px; background: transparent; border: 1px solid var(--primary);
+      font-size: 18px; color: var(--primary); cursor: pointer; transition: 0.4s; letter-spacing: 2px;
+    }
+    #start-btn:hover { background: var(--primary); color: black; box-shadow: 0 0 30px var(--primary); }
+
+    .review-area { max-height: 200px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
+  .site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>FROPPY</h1>
+    <p>"Call me Tsu. *Ribbit*"</p>
+    <label style="margin-bottom: 25px; cursor: pointer; opacity: 0.7;">
+        <input type="checkbox" id="enable-sound"> Synchronize Focus (Audio)
+    </label>
+    <button id="start-btn">BEGIN EVALUATION</button>
+  </div>
+
+  <audio id="myAudio" loop>
+    <source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" />
+  </audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/froppy_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="color: var(--primary); font-size: 11px; margin-bottom: 10px; letter-spacing: 3px; font-weight: bold;">
+          DIVE DEPTH: <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">BACK</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">CAMOUFLAGE (50/50)</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--primary);">0/10</h1>
+        <p id="remarkText" style="margin-bottom: 20px;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; margin-top:20px; border-color: var(--primary);" onclick="location.reload()">RE-DIVE (TRY AGAIN)</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    const audio = document.getElementById("myAudio");
+    const startBtn = document.getElementById("start-btn");
+
+    startBtn.addEventListener("click", () => {
+        document.getElementById("start-screen").style.display = "none";
+        if (document.getElementById("enable-sound").checked) {
+            audio.currentTime = 125; audio.play();
+        }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is Tsuyu Asui's hero name?", a: "Froppy", o: ["Froppy", "Rainy Girl", "Aqua Lily", "Leap Frog"] },
+        { q: "What is the name of her Quirk?", a: "Frog", o: ["Frog", "Amphibian", "Tongue Lash", "Aquatic"] },
+        { q: "Which student is Tsuyu's closest friend in Class 1-A?", a: "Ochaco Uraraka", o: ["Ochaco Uraraka", "Mina Ashido", "Momo Yaoyorozu", "Toru Hagakure"] },
+        { q: "How long can Tsuyu extend her tongue?", a: "20 meters", o: ["10 meters", "15 meters", "20 meters", "25 meters"] },
+        { q: "What is Tsuyu's preferred name for her friends to call her?", a: "Tsu", o: ["Asui", "Tsu-chan", "Tsu", "Froppy"] },
+        { q: "Which hero agency did she intern with?", a: "Selkie", o: ["Selkie", "Fat Gum", "Gunhead", "Ryukyu"] },
+        { q: "What is Tsuyu's birthday?", a: "February 12th", o: ["February 12th", "March 4th", "January 2nd", "May 20th"] },
+        { q: "What happens to Tsuyu when she gets too cold?", a: "She falls into hibernation", o: ["She falls into hibernation", "She loses her quirk", "She turns blue", "She becomes super fast"] },
+        { q: "What is Tsuyu's height?", a: "150 cm", o: ["145 cm", "150 cm", "155 cm", "160 cm"] },
+        { q: "What 'amphibian' ability allows her to hide from enemies?", a: "Camouflage", o: ["Camouflage", "Invisibility", "Mud-coating", "Shadow-blend"] },
+        { q: "What is Tsuyu's blood type?", a: "B", o: ["A", "B", "AB", "O"] },
+        { q: "Tsuyu has two younger siblings. What are their names?", a: "Samidare and Satsuki", o: ["Samidare and Satsuki", "Taro and Hanako", "Ren and Mio", "Kero and Ribbit"] },
+        { q: "What color is her hero costume primary theme?", a: "Green", o: ["Green", "Blue", "Yellow", "Brown"] },
+        { q: "Who did Tsuyu team up with during the USJ incident?", a: "Midoriya and Mineta", o: ["Midoriya and Mineta", "Bakugo and Kirishima", "Todoroki and Shoji", "Uraraka and Iida"] },
+        { q: "What is Tsuyu's favorite food?", a: "Jelly", o: ["Flies", "Jelly", "Ramen", "Apples"] },
+        { q: "Which season does Tsuyu dislike the most?", a: "Winter", o: ["Summer", "Autumn", "Spring", "Winter"] },
+        { q: "During the Provisional License Exam, who was her primary partner?", a: "Shoji", o: ["Shoji", "Tokoyami", "Uraraka", "Momo"] },
+        { q: "What is the name of her ultimate move using her stomach?", a: "Toxic Mucus", o: ["Toxic Mucus", "Acid Spit", "Stomach Wash", "Tongue Whip"] },
+        { q: "What is her student seat number in Class 1-A?", a: "3", o: ["1", "3", "5", "10"] },
+        { q: "What is the sound effect she frequently makes?", a: "Ribbit / Kero", o: ["Ribbit / Kero", "Croak", "Squeak", "Hop"] }
+    ];
+
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "FINISH DIVE" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { finish(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let count = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && count < 2) { b.classList.add("hidden"); count++; }
+        });
+        lifelineStates[currentIndex] = true;
+    }
+
+    function finish() {
+        let score = 0;
+        const review = document.getElementById("reviewList");
+        review.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            review.innerHTML += `<div style="margin-bottom:10px; border-left:3px solid ${isCorrect ? 'var(--primary)' : '#ff4b4b'}; padding-left:12px;">
+                <div style="font-size:14px;">${q.q}</div>
+                <div style="font-size:12px; color:var(--primary)">Answer: ${q.a}</div>
+            </div>`;
+        });
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerText = score + "/10";
+        document.getElementById("remarkText").innerText = score > 7 ? "Magnificent, Tsu! You're a true hero." : "Don't get cold! Jump back in and try again!";
+    }
+</script>
+</body>
+</html>

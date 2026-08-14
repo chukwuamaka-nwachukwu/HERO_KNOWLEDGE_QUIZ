@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Kyoka Jiro</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #af47ff; /* Neon Purple */
+      --secondary: #ff2e63; /* Punk Magenta */
+      --dark: #0d0216;
+      --glass: rgba(20, 10, 30, 0.85);
+      --border: rgba(175, 71, 255, 0.5);
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: var(--dark); font-family: 'Inter', sans-serif;
+      color: white; overflow: hidden;
+    }
+
+    /* Background Pulse Animation */
+    @keyframes pulse-bg {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    }
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: grayscale(0.3) brightness(0.5); }
+    .overlay { position: fixed; inset: 0; background: radial-gradient(circle, rgba(20,20,20,0.7) 0%, rgba(5,5,5,0.95) 100%); z-index: 2; }
+
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 8px; z-index: 10; background: rgba(0,0,0,0.5); }
+    #progressBar { 
+      height: 100%; width: 0%; 
+      background: linear-gradient(90deg, var(--primary), var(--secondary)); 
+      box-shadow: 0 0 20px var(--primary);
+      transition: 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67); 
+    }
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    
+    .circle-btn {
+      width: 45px; height: 45px; border-radius: 12px; background: rgba(255,255,255,0.1); color: white;
+      border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 18px; backdrop-filter: blur(10px);
+    }
+    .circle-btn:hover { background: var(--secondary); border-color: white; transform: rotate(5deg) scale(1.1); }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); backdrop-filter: blur(25px); border: 2px solid var(--border);
+      width: 90%; max-width: 600px; border-radius: 20px; padding: 40px; text-align: center;
+      box-shadow: 0 0 50px rgba(175, 71, 255, 0.2);
+    }
+
+    #questionText { font-size: 22px; font-weight: 600; line-height: 1.4; margin-bottom: 25px; color: #f0f0f0; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(175, 71, 255, 0.3);
+      padding: 18px; border-radius: 8px; color: #ddd; cursor: pointer; transition: 0.2s; font-size: 15px;
+      font-weight: 500;
+    }
+    .option-btn:hover { background: rgba(175, 71, 255, 0.2); border-color: var(--primary); color: white; }
+    .option-btn.selected { background: var(--primary) !important; color: white !important; font-weight: 800; border-color: white; box-shadow: 0 0 15px var(--primary); }
+    .option-btn.hidden { opacity: 0; pointer-events: none; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+    
+    .nav-btn {
+      background: none; border: 1px solid var(--primary); color: var(--primary);
+      padding: 10px 30px; border-radius: 4px; cursor: pointer; transition: 0.3s; 
+      font-size: 12px; font-weight: 900; letter-spacing: 2px;
+    }
+    .nav-btn:hover:not(:disabled) { background: var(--primary); color: white; }
+    .nav-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+    .lifeline-btn { 
+        background: var(--secondary); border: none; padding: 10px 20px; 
+        border-radius: 4px; color: white; cursor: pointer; font-size: 11px; font-weight: 900;
+        text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    #start-screen {
+      position: fixed; inset: 0; background: #000; color: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
+    }
+    #start-screen h1 { font-size: 60px; margin: 0; color: var(--primary); text-shadow: 0 0 20px var(--primary); font-weight: 900; }
+    #start-screen p { letter-spacing: 8px; font-size: 12px; margin-bottom: 40px; color: var(--secondary); }
+
+    #start-btn {
+      padding: 18px 60px; background: transparent; border: 2px solid var(--primary);
+      border-radius: 50px; font-size: 18px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s;
+    }
+    #start-btn:hover { background: var(--primary); box-shadow: 0 0 30px var(--primary); transform: scale(1.05); }
+
+    .review-area { max-height: 220px; overflow-y: auto; text-align: left; padding: 20px; border-radius: 12px; background: rgba(0,0,0,0.4); border: 1px solid #333; }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>JIRO</h1>
+    <p>SOUND-CHECK IN PROGRESS</p>
+    <label style="margin-bottom: 30px; cursor: pointer; font-size: 12px; opacity: 0.6;">
+        <input type="checkbox" id="enable-sound"> PLUG IN AUDIO (YOU SAY RUN)
+    </label>
+    <button id="start-btn">STAGE START</button>
+  </div>
+
+  <audio id="myAudio" loop><source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" /></audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/jiro_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="color: var(--secondary); font-size: 11px; margin-bottom: 10px; letter-spacing: 3px; font-weight: 800;">
+          SETLIST: <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">Calibrating jacks...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">BACK</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">AMPLIFIER BOOST</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--primary);">0/10</h1>
+        <p id="remarkText" style="margin-bottom: 20px; font-weight: bold; letter-spacing: 2px;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; margin-top:20px; border-color: var(--primary); color: var(--primary);" onclick="location.reload()">REPLAY GIG</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    const startBtn = document.getElementById("start-btn");
+    const audio = document.getElementById("myAudio");
+
+    startBtn.addEventListener("click", () => {
+        document.getElementById("start-screen").style.display = "none";
+        if (document.getElementById("enable-sound").checked) {
+            audio.currentTime = 125; audio.play();
+        }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is Kyoka Jiro's hero name?", a: "Earphone Jack", o: ["Earphone Jack", "Soundwave", "Deep Vibe", "Audio Girl"] },
+        { q: "What is her seat number in Class 1-A?", a: "12", o: ["10", "12", "14", "16"] },
+        { q: "Which student is Jiro most frequently seen teasing?", a: "Denki Kaminari", o: ["Katsuki Bakugo", "Denki Kaminari", "Minoru Mineta", "Hantero Sero"] },
+        { q: "What role did she play in the Class 1-A band?", a: "Lead Vocalist & Bassist", o: ["Drummer", "Lead Vocalist & Bassist", "Pianist", "Guitarist"] },
+        { q: "Both of Jiro's parents have careers in what industry?", a: "Music", o: ["Heroics", "Music", "Support Item Dev", "Medicine"] },
+        { q: "Which Pro Hero did Jiro intern with during the Field Training arc?", a: "Death Arms", o: ["Gunhead", "Death Arms", "Fat Gum", "Fourth Kind"] },
+        { q: "What is the name of her ultimate move used to shatter the ground?", a: "Heartbeat Fuzz", o: ["Sonic Smash", "Heartbeat Fuzz", "Vibration Wave", "Echo Cannon"] },
+        { q: "During the USJ arc, what weapon did Jiro use to fight villains?", a: "A Sword", o: ["A Sword", "A Support Boot", "Her Jacks", "Sonic Grenades"] },
+        { q: "What is Jiro's favorite thing?", a: "Rock Music", o: ["Spicy Food", "Rock Music", "Reading", "Dancing"] },
+        { q: "What color is Jiro's hair?", a: "Deep Purple", o: ["Black", "Deep Purple", "Dark Blue", "Magenta"] },
+        { q: "What is the maximum length her jacks can stretch?", a: "6 meters", o: ["3 meters", "6 meters", "10 meters", "12 meters"] },
+        { q: "What class 1-A student is Jiro's best friend?", a: "Momo Yaoyorozu", o: ["Mina Ashido", "Momo Yaoyorozu", "Ochaco Uraraka", "Tsuyu Asui"] },
+        { q: "Her support items on her wrists are actually _____.", a: "Amplifiers", o: ["Speakers", "Amplifiers", "Recorders", "Shields"] },
+        { q: "What instrument is Jiro most skilled at?", a: "Bass Guitar", o: ["Drums", "Piano", "Bass Guitar", "Violin"] },
+        { q: "What is Jiro's Quirk classification?", a: "Mutant", o: ["Emitter", "Transformation", "Mutant", "Accumulation"] },
+        { q: "In the School Festival, who helped Jiro convince her parents to let her be a hero?", a: "Her father", o: ["Momo", "Kaminari", "Her father", "Present Mic"] },
+        { q: "What is Jiro's height?", a: "154 cm", o: ["150 cm", "154 cm", "158 cm", "162 cm"] },
+        { q: "What is Jiro's birthday?", a: "August 1st", o: ["August 1st", "September 15th", "May 20th", "July 12th"] },
+        { q: "What is the name of Jiro's father?", a: "Kyotoku", o: ["Kyotoku", "Mika", "Tensei", "Enji"] },
+        { q: "Which class 1-A student's room did Jiro call 'too uncool' to enter?", a: "Sato", o: ["Midoriya", "Mineta", "Sato", "Aoyama"] }
+    ];
+
+    let highScore = localStorage.getItem("jiro_high_score") || 0;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "END GIG" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { finish(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let count = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && count < 2) { b.classList.add("hidden"); count++; }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function finish() {
+        let score = 0;
+        const review = document.getElementById("reviewList");
+        review.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            review.innerHTML += `<div style="margin-bottom:12px; border-left:3px solid ${isCorrect ? 'var(--primary)' : 'var(--secondary)'}; padding-left:15px;">
+                <div style="font-size:13px; font-weight:bold;">${q.q}</div>
+                <div style="font-size:11px; color:var(--primary)">Vibe: ${q.a}</div>
+            </div>`;
+        });
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("jiro_high_score", highScore);
+        }
+
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerText = score + "/10";
+        document.getElementById("remarkText").innerText = score > 7 ? "ENCORE! YOU ROCKED IT!" : "OUT OF TUNE. TRY AGAIN.";
+    }
+</script>
+</body>
+</html>

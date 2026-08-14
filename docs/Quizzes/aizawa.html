@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Shota Aizawa</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #f1c40f; /* Goggle Yellow */
+      --accent: #ffffff;
+      --bg: #0a0a0a; /* Matte Black */
+      --glass: rgba(15, 15, 15, 0.98);
+      --border: #333;
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: var(--bg); font-family: 'Inter', sans-serif;
+      color: white; overflow: hidden;
+    }
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: grayscale(1) brightness(0.3); }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(0deg, #0a0a0a 20%, transparent 100%); z-index: 2; }
+
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; z-index: 10; background: rgba(255,255,255,0.05); }
+    #progressBar { height: 100%; width: 0%; background: var(--primary); transition: 0.3s; box-shadow: 0 0 10px var(--primary); }
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    .circle-btn { width: 45px; height: 45px; border-radius: 50%; background: transparent; color: var(--primary); border: 1px solid var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; font-size: 18px; }
+    .circle-btn:hover { background: var(--primary); color: black; transform: rotate(90deg); }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    
+    .quiz-card {
+      background: var(--glass); border-left: 5px solid var(--primary);
+      width: 90%; max-width: 600px; padding: 40px; text-align: left;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      position: relative;
+    }
+
+    /* Subtle Scanline effect to mimic goggles */
+    .quiz-card::after {
+      content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(241, 196, 15, 0.03) 3px);
+      pointer-events: none; border-radius: inherit;
+    }
+
+    #questionText { font-size: 22px; font-weight: 500; color: #fff; line-height: 1.5; margin: 15px 0; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 25px 0; }
+
+    .option-btn {
+      background: #111; border: 1px solid #222; padding: 16px; color: #aaa; cursor: pointer; transition: 0.2s; font-size: 15px;
+    }
+    .option-btn:hover { border-color: var(--primary); color: white; background: #1a1a1a; }
+    .option-btn.selected { background: var(--primary) !important; color: black !important; font-weight: bold; border-color: var(--primary); }
+    .option-btn.hidden { visibility: hidden; pointer-events: none; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; border-top: 1px solid #222; padding-top: 20px; }
+    .nav-btn { background: none; border: none; color: #555; padding: 10px 20px; cursor: pointer; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+    .nav-btn:hover:not(:disabled) { color: var(--primary); }
+    .nav-btn:disabled { opacity: 0.1; }
+
+    .lifeline-btn { 
+        background: transparent; border: 1px solid var(--primary); padding: 8px 15px; 
+        color: var(--primary); cursor: pointer; font-size: 11px; text-transform: uppercase; font-weight: bold;
+    }
+    .lifeline-btn:disabled { border-color: #222; color: #222; }
+
+    #start-screen { position: fixed; inset: 0; background: #000; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; }
+    #start-screen h1 { font-size: 3rem; letter-spacing: 8px; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; }
+    #start-screen button { padding: 15px 50px; background: transparent; border: 1px solid var(--primary); color: var(--primary); font-size: 16px; cursor: pointer; letter-spacing: 2px; }
+    #start-screen button:hover { background: var(--primary); color: black; }
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+ 
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>Eraser Head</h1>
+    <p style="opacity: 0.5; margin-bottom: 30px;">CLASS 1-A PLACEMENT EXAM</p>
+    <label style="margin-bottom: 30px; cursor: pointer; opacity: 0.6; font-size: 12px; letter-spacing: 1px;">
+      <input type="checkbox" id="enable-sound"> SYNCHRONIZE AUDIO
+    </label>
+    <button id="start-btn">BEGIN EVALUATION</button>
+  </div>
+
+  <audio id="myAudio" loop><source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" /></audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/eraserhead_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="color: #444; font-size: 10px; margin-bottom: 10px; font-weight: bold; letter-spacing: 2px;">
+          EVALUATION LOG: <span id="qNum" style="color: var(--primary);">1</span>/10
+        </div>
+        <h2 id="questionText">...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Back</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">Erasure (50/50)</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+        </div>
+      </div>
+  <footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer>
+      <div id="results-area" style="display:none; text-align: center;">
+        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--primary);">0/10</h1>
+        <p id="remarkText" style="letter-spacing: 2px; margin-bottom: 20px; font-weight: bold;"></p>
+        <div id="reviewList" style="text-align: left; max-height: 200px; overflow-y: auto; margin: 20px 0; background: #080808; padding: 15px; border: 1px solid #222;"></div>
+        <button class="option-btn" style="width:100%; text-align:center; color: var(--primary);" onclick="location.reload()">NEW EVALUATION</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audio = document.getElementById("myAudio");
+    document.getElementById("start-btn").addEventListener("click", () => {
+        document.getElementById("start-screen").style.display = "none";
+        if(document.getElementById("enable-sound").checked) {
+            audio.currentTime = 125; audio.play();
+        }
+        init();
+    });
+
+    // ... (rest of your existing logic for allQuestions, init, render, nextQuestion, etc.)
+    // Note: ensure useLifeline and finish use the new IDs provided above.
+    
+    // Existing variable logic from your snippet...
+    const allQuestions = [
+        { q: "What is Aizawa's Pro Hero name?", a: "Eraser Head", o: ["Eraser Head", "Nighteye", "Silence", "The Goggle Hero"] },
+        { q: "What is the name of his Quirk?", a: "Erasure", o: ["Nullify", "Erasure", "Blink", "Void"] },
+        { q: "Which class does he serve as the homeroom teacher for?", a: "Class 1-A", o: ["Class 1-A", "Class 1-B", "Class 2-A", "General Ed 1-C"] },
+        { q: "What item does Aizawa use to restrain enemies?", a: "Capturing Cloth", o: ["Steel Chains", "Capturing Cloth", "Sticky Orbs", "Energy Ropes"] },
+        { q: "What physical side effect does his Quirk cause?", a: "Dry Eye", o: ["Headaches", "Dry Eye", "Nosebleeds", "Temporary Blindness"] },
+        { q: "Who gave Shota Aizawa the hero name 'Eraser Head'?", a: "Present Mic", o: ["All Might", "Midnight", "Present Mic", "Oboro Shirakumo"] },
+        { q: "What is Aizawa's favorite food?", a: "Energy Jelly", o: ["Sushi", "Energy Jelly", "Salty Ramen", "Coffee Beans"] },
+        { q: "What animal is Aizawa famously fond of?", a: "Cats", o: ["Dogs", "Cats", "Owls", "Hamsters"] },
+        { q: "Which Pro Hero was Aizawa's close friend during their U.A. student days?", a: "Present Mic", o: ["Endeavor", "Present Mic", "Best Jeanist", "Gunhead"] },
+        { q: "What is the primary material of his Capture Weapon?", a: "Metal alloy wire and carbon fiber", o: ["Synthetic silk", "Metal alloy wire and carbon fiber", "Reinforced leather", "High-tension rubber"] },
+        { q: "What is Aizawa's birthday?", a: "November 8th", o: ["November 8th", "January 1st", "July 4th", "May 20th"] },
+        { q: "In the USJ incident, which group did Aizawa fight alone to protect his students?", a: "The League of Villains", o: ["The League of Villains", "The Meta Liberation Army", "Hassaikai", "Stain's Followers"] },
+        { q: "Why does Aizawa wear goggles during combat?", a: "To hide his line of sight", o: ["To prevent dust", "To hide his line of sight", "To see in the dark", "To zoom in on targets"] },
+        { q: "What is Aizawa's blood type?", a: "B", o: ["A", "B", "O", "AB"] },
+        { q: "Which childhood friend of Aizawa's was tragically killed and turned into Kurogiri?", a: "Oboro Shirakumo", o: ["Tensei Iida", "Oboro Shirakumo", "Mirai Sasaki", "Enji Todoroki"] },
+        { q: "Aizawa famously expelled an entire class of how many students once?", a: "All of them (Class of 154)", o: ["5", "10", "20", "All of them (Class of 154)"] },
+        { q: "What is Aizawa's height?", a: "183 cm", o: ["175 cm", "180 cm", "183 cm", "190 cm"] },
+        { q: "In the Shie Hassaikai arc, who did Aizawa team up with to enter the hideout?", a: "Fat Gum and Kirishima", o: ["Nighteye and Mirio", "Fat Gum and Kirishima", "Rock Lock and Deku", "Ryukyu and Uraraka"] },
+        { q: "What color does Aizawa's hair turn when he activates his Quirk?", a: "It doesn't change color (it stands up)", o: ["White", "Red", "Yellow", "It doesn't change color (it stands up)"] },
+        { q: "What is Aizawa's hero costume primarily composed of?", a: "A black jumpsuit", o: ["A black jumpsuit", "Armor plates", "A yellow cape", "Formal suit"] }
+    ];
+
+    let highScore = localStorage.getItem("aizawa_high_score") || 0;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+        
+        const grid = document.getElementById("optionsGrid"); 
+        grid.innerHTML = "";
+        
+        q.o.forEach(opt => {
+            const btn = document.createElement("button"); 
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt; 
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); }; 
+            grid.appendChild(btn);
+        });
+        
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "FINISH EVALUATION" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() { 
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { finish(); } 
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let wrongOptions = buttons.filter(b => b.innerText !== q.a);
+        wrongOptions.sort(() => 0.5 - Math.random()).slice(0, 2).forEach(b => b.classList.add("hidden"));
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function finish() {
+        let score = 0;
+        const review = document.getElementById("reviewList"); 
+        review.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a; 
+            if (isCorrect) score++;
+            review.innerHTML += `
+            <div style="margin-bottom:10px; border-left:4px solid ${isCorrect ? '#f1c40f' : '#222'}; padding-left:10px;">
+                <div style="font-size:13px; color: ${isCorrect ? '#fff' : '#666'}">${q.q}</div>
+                <div style="font-size:11px; color:#f1c40f">LOGGED ANS: ${q.a}</div>
+            </div>`;
+        });
+        if (score > highScore) { highScore = score; localStorage.setItem("aizawa_high_score", highScore); }
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerHTML = `${score}/10 <div style="font-size:14px; color:#444; margin-top:10px;">PEAK PERFORMANCE: ${highScore}/10</div>`;
+        document.getElementById("remarkText").innerText = score > 7 ? "RATIONAL RESULTS. YOU HAVE POTENTIAL." : "IRRATIONAL. DON'T WASTE MY TIME.";
+    }
+  </script>
+</body>
+</html>

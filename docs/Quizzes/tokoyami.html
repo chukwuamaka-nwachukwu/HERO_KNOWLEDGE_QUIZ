@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Fumikage Tokoyami</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #8e44ad; /* Dark Shadow Purple */
+      --secondary: #121212; /* Raven Black */
+      --text: #b0b0b0; /* Reduced brightness silver */
+      --glass: rgba(15, 15, 25, 0.96);
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: #05050a; font-family: 'Georgia', serif;
+      color: var(--text); overflow: hidden;
+    }
+
+    /* Video & Overlay with reduced brightness */
+    #bgVideo { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: grayscale(0.7) brightness(0.2); }
+    .overlay { position: fixed; inset: 0; background: linear-gradient(135deg, rgba(13,2,22,0.50) 0%, rgba(0,0,0,0.55) 100%); z-index: 2; }
+
+    .progress-container { position: fixed; top: 0; width: 100%; height: 5px; z-index: 10; background: #000; }
+    #progressBar { height: 100%; width: 0%; background: var(--primary); box-shadow: 0 0 15px var(--primary); transition: 0.5s ease-in-out; }
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    .site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+    .circle-btn {
+      width: 45px; height: 45px; border-radius: 50%; background: #1a1a1a; color: var(--primary);
+      border: 1px solid var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+    }
+    .circle-btn:hover { background: var(--primary); color: #000; transform: scale(1.1); }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+
+    .quiz-card {
+      background: var(--glass); border-top: 5px solid var(--primary);
+      width: 90%; max-width: 600px; padding: 40px; border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+    }
+
+    #questionText { font-weight: normal; font-size: 22px; line-height: 1.5; color: #ccc; margin-bottom: 30px; min-height: 66px; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: #161625; border: 1px solid #333;
+      padding: 16px; color: #888; cursor: pointer; transition: 0.3s; text-align: left;
+      font-family: 'Georgia', serif; font-size: 15px; border-radius: 4px;
+    }
+    .option-btn:hover { border-color: var(--primary); color: #ddd; background: #20203a; }
+    .option-btn.selected { background: var(--primary) !important; color: white !important; border-color: #fff; }
+    .option-btn.hidden { opacity: 0; pointer-events: none; transform: scale(0.9); }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+    
+    .nav-btn { background: none; border: none; color: var(--primary); padding: 10px 20px; cursor: pointer; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
+    .nav-btn:disabled { opacity: 0.1; cursor: default; }
+
+    .lifeline-btn { 
+        background: transparent; border: 1px solid #444; padding: 10px 20px; 
+        color: #666; cursor: pointer; font-size: 11px; text-transform: uppercase; border-radius: 4px;
+    }
+    .lifeline-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+
+    #start-screen {
+      position: fixed; inset: 0; background: #000; z-index: 999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    }
+    #start-screen h1 { font-size: 3.5rem; letter-spacing: 15px; color: var(--primary); text-transform: uppercase; margin: 0; }
+    #start-screen p { font-style: italic; color: #444; margin-bottom: 40px; letter-spacing: 2px; }
+
+    #start-btn {
+      padding: 15px 60px; background: transparent; border: 1px solid var(--primary);
+      color: var(--primary); font-size: 18px; cursor: pointer; transition: 0.5s; font-family: 'Georgia', serif;
+    }
+    #start-btn:hover { background: var(--primary); color: #000; letter-spacing: 4px; box-shadow: 0 0 25px var(--primary); }
+
+    .review-area { max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.6); padding: 20px; border: 1px solid #222; margin: 20px 0; text-align: left; border-radius: 5px; }
+    .review-item { margin-bottom: 12px; padding-left: 12px; }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>TSUKUYOMI</h1>
+    <p>Revelry in the dark...</p>
+    <label style="margin-bottom: 30px; cursor: pointer; color: #666; font-size: 14px; user-select: none;">
+      <input type="checkbox" id="enable-sound"> Synchronize Abyss Audio
+    </label>
+    <button id="start-btn">Begin Exam</button>
+  </div>
+
+  <audio id="myAudio" loop><source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" /></audio>
+
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/tokoyami_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" title="Exit" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" title="Fullscreen" onclick="document.documentElement.requestFullscreen()">⛶</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="font-size: 11px; color: var(--primary); margin-bottom: 15px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.8;">
+          Trial: <span id="qNum">1</span> / 10
+        </div>
+        <h2 id="questionText">Invoking the darkness...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">BACK</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">SHADOW 50/50</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none; text-align: center;">
+        <h1 id="scoreDisplay" style="font-size: 80px; margin: 0; color: var(--primary);">0</h1>
+        <p id="remarkText" style="font-style: italic; color: #666; margin-bottom: 20px;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; text-align:center; background: var(--primary); color: #fff; border: none;" onclick="location.reload()">RE-ATTEMPT TRIAL</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audio = document.getElementById("myAudio");
+    
+    document.getElementById("start-btn").addEventListener("click", () => {
+        document.getElementById("start-screen").style.display = "none";
+        
+        // Final logic check for audio synchronization
+        const soundEnabled = document.getElementById("enable-sound").checked;
+        if (soundEnabled) {
+            audio.currentTime = 125; 
+            audio.play().catch(e => console.log("Audio requires user interaction first."));
+        }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is Fumikage Tokoyami's Hero Name?", a: "Tsukuyomi", o: ["Tsukuyomi", "Dark Shadow", "Night Raven", "Jet-Black Hero"] },
+        { q: "What is the name of his Quirk?", a: "Dark Shadow", o: ["Abyss", "Dark Shadow", "Shadow Soul", "Raven"] },
+        { q: "Who did Tokoyami intern with during his Work Studies?", a: "Hawks", o: ["Best Jeanist", "Endeavor", "Hawks", "Edge-shot"] },
+        { q: "What is Dark Shadow's primary weakness?", a: "Bright Light", o: ["Bright Light", "Loud Noises", "Cold Temperatures", "Physical Impacts"] },
+        { q: "What is Tokoyami's favorite catchphrase?", a: "Revelry in the dark", o: ["Behold the shadow", "Revelry in the dark", "Embrace the void", "Wings of night"] },
+        { q: "What is Tokoyami's favorite food?", a: "Apples", o: ["Apples", "Grapes", "Seeds", "Dark Chocolate"] },
+        { q: "What happens to Dark Shadow in total darkness?", a: "It becomes powerful but uncontrollable", o: ["It disappears", "It becomes powerful but uncontrollable", "It shrinks", "It falls asleep"] },
+        { q: "What is Tokoyami's birthday?", a: "October 30th", o: ["October 30th", "October 31st", "November 1st", "September 22nd"] },
+        { q: "What is the name of his ultimate move where he dons Dark Shadow as armor?", a: "Black Abyss", o: ["Shadow Shroud", "Black Abyss", "Dark Aegis", "Night Cloak"] },
+        { q: "What is the name of the flight technique Hawks taught him?", a: "Black Fallen Angel", o: ["Shadow Flight", "Black Fallen Angel", "Raven Wing", "Dark Soar"] },
+        { q: "What is Tokoyami's blood type?", a: "AB", o: ["A", "B", "O", "AB"] },
+        { q: "What rank did Tokoyami achieve in the U.A. Sports Festival?", a: "3rd", o: ["1st", "2nd", "3rd", "4th"] },
+        { q: "What is Tokoyami's height?", a: "158 cm", o: ["150 cm", "158 cm", "165 cm", "170 cm"] },
+        { q: "In the Joint Training arc, who was Tokoyami's main rival?", a: "Shihai Kuroiro", o: ["Manga Fukidashi", "Shihai Kuroiro", "Itsuka Kendo", "Jurota Shishida"] },
+        { q: "What is the name of the move where Dark Shadow strikes from within a cloak?", a: "Sabbath", o: ["Black Ankh", "Sabbath", "Piercing Claw", "Shadow Jab"] },
+        { q: "Which class does Tokoyami belong to?", a: "Class 1-A", o: ["Class 1-A", "Class 1-B", "Class 2-A", "Class 1-C"] },
+        { q: "What is the name of his hometown?", a: "Shizuoka Prefecture", o: ["Tokyo", "Shizuoka Prefecture", "Kyoto", "Osaka"] },
+        { q: "What is Tokoyami's seat number?", a: "14", o: ["4", "10", "14", "18"] },
+        { q: "During the training camp, whose light quirk suppressed Dark Shadow?", a: "Aoyama", o: ["Bakugo", "Aoyama", "Todoroki", "Midoriya"] },
+        { q: "What is the nature of the relationship between Tokoyami and Dark Shadow?", a: "Host and Sentient Being", o: ["Master and Slave", "Host and Sentient Being", "Brother and Sister", "Energy and User"] }
+    ];
+
+    let highScore = localStorage.getItem("tokoyami_high_score") || 0;
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        // Shuffling all 20 and picking 10
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "FINISH" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { showResults(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let count = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && count < 2) {
+                b.classList.add("hidden");
+                count++;
+            }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function showResults() {
+        let score = 0;
+        const review = document.getElementById("reviewList");
+        review.innerHTML = "";
+        
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            review.innerHTML += `
+                <div class="review-item" style="border-left: 3px solid ${isCorrect ? 'var(--primary)' : '#500'}">
+                    <div style="font-size: 14px; color: #aaa;">${q.q}</div>
+                    <div style="font-size: 12px; color: ${isCorrect ? 'var(--primary)' : '#e74c3c'}">
+                        ${isCorrect ? 'Correct' : 'Shadow Data: ' + q.a}
+                    </div>
+                </div>`;
+        });
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("tokoyami_high_score", highScore);
+        }
+
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerHTML = `${score}/10 <span style="font-size:18px; color:#444; display:block;">HIGHEST RECORD: ${highScore}/10</span>`;
+        document.getElementById("remarkText").innerText = score > 7 ? "The darkness acknowledges your wisdom." : "The shadow has fallen. Try once more.";
+    }
+  </script>
+</body>
+</html>

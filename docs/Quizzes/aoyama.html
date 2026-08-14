@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHA Quiz | Yuga Aoyama</title>
+  <link rel="shortcut icon" href="../Static/mha_logo.png" type="image/x-icon">
+  <style>
+    :root {
+      --primary: #ffd700; /* Dazzling Gold */
+      --secondary: #6a4ea1; /* Deeper Purple for readability */
+      --accent: #00ffff; /* Laser Blue */
+      --bg: #0a001a;    /* Darker Deep Purple background */
+      --glass: rgba(0, 0, 0, 0.75); /* Darker card background */
+    }
+
+    @keyframes sparkle {
+      0% { box-shadow: 0 0 15px var(--primary); }
+      50% { box-shadow: 0 0 40px var(--accent); }
+      100% { box-shadow: 0 0 15px var(--primary); }
+    }
+
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background: var(--bg); font-family: 'Georgia', serif;
+      color: white; overflow: hidden;
+    }
+
+    #bgVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.3); }
+    
+    /* DARKER OVERLAY - Increased opacity from 0.85 to 0.92 for a deeper cinematic feel */
+    .overlay { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: radial-gradient(circle, rgba(10, 0, 26, 0.7), rgba(0, 0, 0, 0.75)); 
+      z-index: 2; 
+    }
+
+    .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 8px; z-index: 10; background: rgba(255,255,255,0.05); }
+    #progressBar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: 0.5s; box-shadow: 0 0 20px var(--accent); }
+
+    .nav-container { position: fixed; top: 25px; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 10; box-sizing: border-box; }
+    .circle-btn {
+      width: 50px; height: 50px; border-radius: 50%; background: #000; color: var(--primary);
+      border: 2px solid var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.3s; font-size: 20px;
+    }
+    .circle-btn:hover { transform: scale(1.2) rotate(180deg); background: var(--primary); color: #000; }
+
+    .quiz-container { position: relative; z-index: 5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    
+    .quiz-card {
+      background: var(--glass); backdrop-filter: blur(20px); border: 2px solid var(--primary);
+      width: 90%; max-width: 650px; border-radius: 50px 0 50px 0; padding: 40px; text-align: center;
+      animation: sparkle 3.5s infinite;
+    }
+
+    #questionText { font-size: 24px; font-style: italic; text-shadow: 0 0 15px rgba(255, 215, 0, 0.5); color: #fff; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0; }
+
+    .option-btn {
+      background: rgba(147, 112, 219, 0.1); border: 1px solid var(--secondary); padding: 18px; 
+      border-radius: 20px; color: #ddd; cursor: pointer; transition: 0.3s; font-size: 16px;
+    }
+    .option-btn:hover { background: var(--secondary); color: white; transform: translateY(-3px); border-color: var(--accent); }
+    .option-btn.selected { background: var(--primary) !important; color: black !important; font-weight: bold; border-color: white; box-shadow: 0 0 20px var(--primary); }
+    .option-btn.hidden { opacity: 0; visibility: hidden; }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+    .nav-btn { background: none; border: 1px solid var(--primary); color: var(--primary); padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: bold; }
+    .nav-btn:hover:not(:disabled) { background: var(--primary); color: black; }
+    .nav-btn:disabled { opacity: 0.2; border-color: #444; color: #444; }
+
+    .lifeline-btn { background: linear-gradient(45deg, var(--primary), var(--accent)); border: none; padding: 10px 20px; border-radius: 50px; color: black; font-weight: bold; cursor: pointer; font-size: 12px; }
+
+    #start-screen { position: fixed; inset: 0; background: #000; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; }
+    #start-screen h1 { font-size: 4rem; text-shadow: 0 0 30px var(--primary); margin: 0; letter-spacing: 5px; }
+    #start-btn { margin-top: 40px; padding: 20px 60px; background: var(--primary); border: none; border-radius: 50px; font-size: 22px; font-weight: bold; cursor: pointer; transition: 0.3s; color: black; }
+    #start-btn:hover { transform: scale(1.1); box-shadow: 0 0 50px var(--primary); }
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0; /* ensure it spans full width */
+  width: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+  text-align: center; /* center text */
+  padding: 12px 0;
+  font-size: 14px;
+  z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
+}
+
+.site-footer .footer-container {
+  width: 100%; /* let it span full width */
+  margin: 0 auto;
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+.footer-links {
+  display: inline-block; /* keeps links centered under text */
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  margin: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00ffaa;
+}
+
+
+    .review-area { max-height: 200px; overflow-y: auto; text-align: left; background: rgba(0, 0, 0, 0.6); padding: 15px; border-radius: 15px; border: 1px solid var(--secondary); }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <h1>✨ SPARKLING ✨</h1>
+    <p><i>"I cannot stop twinkling, mon ami!"</i></p>
+    <label style="margin-bottom: 20px; cursor: pointer; opacity: 0.8;"><input type="checkbox" id="enable-sound"> Synchronize Elegance (Audio)</label>
+    <button id="start-btn">BEHOLD MY GLORY</button>
+  </div>
+
+  <audio id="myAudio" loop><source src="../Static/Yuki_Hayashi_-_My_Hero_Academia_OST_-_You_Say_Run_(mp3.pm).mp3" type="audio/mp3" /></audio>
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <video id="bgVideo" autoplay muted loop playsinline><source src="../Static/aoyoma_gid.mp4" type="video/mp4"></video>
+  <div class="overlay"></div>
+
+  <div class="nav-container">
+    <button class="circle-btn" onclick="location.href='../Characters_Selection.html'">✖</button>
+    <button class="circle-btn" onclick="document.documentElement.requestFullscreen()">✨</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-card">
+      <div id="game-area">
+        <div style="color: var(--primary); letter-spacing: 2px; font-size: 12px; margin-bottom: 10px; font-weight: bold;">EXHIBIT: <span id="qNum">1</span> / 10</div>
+        <h2 id="questionText">Initializing...</h2>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="controls">
+          <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">PRÉCÉDENT</button>
+          <button class="lifeline-btn" id="lifelineBtn" onclick="useLifeline()">NON-STOP BEAM!</button>
+          <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">SUIVANT</button>
+        </div>
+      </div>
+<footer class="site-footer">
+  <div class="footer-container">
+    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
+    <p class="footer-links">
+      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
+      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
+      <a href="./index.html">Back to Dashboard</a>
+    </p>
+  </div>
+</footer> 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 60px; color: var(--primary); text-shadow: 0 0 20px var(--primary);">0/10</h1>
+        <p id="remarkText" style="font-style: italic; font-size: 20px; margin-bottom: 20px;"></p>
+        <div id="reviewList" class="review-area"></div>
+        <button class="option-btn" style="width:100%; margin-top:20px; background: var(--primary); color: black;" onclick="location.reload()">ENCORE! (RE-ATTEMPT)</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    const audio = document.getElementById("myAudio");
+    const startBtn = document.getElementById("start-btn");
+
+    startBtn.addEventListener("click", () => {
+        document.getElementById("start-screen").style.display = "none";
+        if(document.getElementById("enable-sound").checked) { audio.currentTime = 125; audio.play(); }
+        init();
+    });
+
+    const allQuestions = [
+        { q: "What is Yuga Aoyama's hero name?", a: "Can't Stop Twinkling", o: ["Sparkle Prince", "Can't Stop Twinkling", "Navel Laser", "Bright Star"] },
+        { q: "What is the name of his Quirk?", a: "Navel Laser", o: ["Belly Beam", "Navel Laser", "Glitter Dash", "Solar Blast"] },
+        { q: "What item must he wear to control his quirk?", a: "A specialized belt", o: ["A specialized belt", "A headband", "Bracers", "Glowing boots"] },
+        { q: "In which class is Aoyama a student?", a: "Class 1-A", o: ["Class 1-B", "Class 1-A", "Class 1-C", "Class 2-A"] },
+        { q: "What physical side effect occurs if he fires his laser for too long?", a: "Stomach ache", o: ["Blindness", "Headache", "Stomach ache", "Dizziness"] },
+        { q: "What is his favorite food?", a: "Cheese", o: ["Croissants", "Cheese", "Macarons", "Caviar"] },
+        { q: "What is Aoyama's blood type?", a: "B", o: ["A", "B", "O", "AB"] },
+        { q: "In which city was he born?", a: "Paris", o: ["Paris", "Tokyo", "Lyon", "Musutafu"] },
+        { q: "What is his favorite plant/flower?", a: "Roses", o: ["Lilies", "Sunflowers", "Roses", "Lavender"] },
+        { q: "What is Yuga's birthday?", a: "May 30th", o: ["May 30th", "June 15th", "April 1st", "May 10th"] },
+        { q: "Who was his mentor during the Provisional License exam?", a: "None/He worked alone", o: ["Iida", "None/He worked alone", "Midoriya", "Uraraka"] },
+        { q: "What color is his hero costume cape?", a: "Purple", o: ["Gold", "Red", "Purple", "Blue"] },
+        { q: "What is his designated student number in Class 1-A?", a: "1", o: ["1", "5", "10", "20"] },
+        { q: "Which student did he creepily leave cheese for in the middle of the night?", a: "Izuku Midoriya", o: ["Izuku Midoriya", "Katsuki Bakugo", "Tenya Iida", "Mina Ashido"] },
+        { q: "Which special move involves firing his laser from his shoulders and knees?", a: "Navel Buffet", o: ["Star Rain", "Navel Buffet", "Twinkle Beam", "Disco Blast"] },
+        { q: "What language does he frequently sprinkle into his speech?", a: "French", o: ["English", "French", "Spanish", "Italian"] },
+        { q: "What color are his eyes?", a: "Violet", o: ["Blue", "Violet", "Gold", "Green"] },
+        { q: "He was actually born ____ before receiving a quirk from All For One.", a: "Quirkless", o: ["Quirkless", "With a weak quirk", "With a broken quirk", "Twinkling"] },
+        { q: "What is the name of his father?", a: "Mr. Aoyama", o: ["Gaston", "Mr. Aoyama", "Pierre", "Jacques"] },
+        { q: "What phrase does he often say when he is 'sparkling'?", a: "Magnifique!", o: ["Magnifique!", "C'est la vie!", "Pardon!", "Bonjour!"] }
+    ];
+
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let userSelections = new Array(10).fill(null);
+    let lifelineStates = new Array(10).fill(false);
+
+    function init() {
+        currentQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+        render();
+    }
+
+    function render() {
+        const q = currentQuestions[currentIndex];
+        document.getElementById("qNum").innerText = currentIndex + 1;
+        document.getElementById("questionText").innerText = q.q;
+        document.getElementById("progressBar").style.width = ((currentIndex + 1) / 10) * 100 + "%";
+        const grid = document.getElementById("optionsGrid");
+        grid.innerHTML = "";
+        q.o.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = `option-btn ${userSelections[currentIndex] === opt ? 'selected' : ''}`;
+            btn.innerText = opt;
+            btn.onclick = () => { userSelections[currentIndex] = opt; render(); };
+            grid.appendChild(btn);
+        });
+        document.getElementById("prevBtn").disabled = currentIndex === 0;
+        document.getElementById("nextBtn").innerText = currentIndex === 9 ? "FINISH SPECTACLE" : "NEXT";
+        document.getElementById("lifelineBtn").disabled = lifelineStates[currentIndex];
+    }
+
+    function nextQuestion() {
+        if (currentIndex < 9) { currentIndex++; render(); } 
+        else { finish(); }
+    }
+
+    function prevQuestion() { if (currentIndex > 0) { currentIndex--; render(); } }
+
+    function useLifeline() {
+        if (lifelineStates[currentIndex]) return;
+        const q = currentQuestions[currentIndex];
+        const buttons = Array.from(document.querySelectorAll(".option-btn"));
+        let count = 0;
+        buttons.forEach(b => {
+            if (b.innerText !== q.a && count < 2) { b.classList.add("hidden"); count++; }
+        });
+        lifelineStates[currentIndex] = true;
+        document.getElementById("lifelineBtn").disabled = true;
+    }
+
+    function finish() {
+        let score = 0;
+        const review = document.getElementById("reviewList");
+        review.innerHTML = "";
+        currentQuestions.forEach((q, i) => {
+            const isCorrect = userSelections[i] === q.a;
+            if (isCorrect) score++;
+            review.innerHTML += `<div style="margin-bottom:10px; border-left:3px solid ${isCorrect ? 'var(--primary)' : '#ff4b4b'}; padding-left:12px;">
+                <div style="font-size:14px;">${q.q}</div>
+                <div style="font-size:12px; color:${isCorrect ? 'var(--primary)' : '#ff4b4b'}">Réponse: ${q.a}</div>
+            </div>`;
+        });
+        document.getElementById("game-area").style.display = "none";
+        document.getElementById("results-area").style.display = "block";
+        document.getElementById("scoreDisplay").innerText = score + "/10";
+        document.getElementById("remarkText").innerText = score > 7 ? "Magnifique! Your sparkle is blinding!" : "Don't lose your twinkle, mon cher!";
+    }
+</script>
+</body>
+</html>
