@@ -661,7 +661,7 @@ main.content {/* pushes footer down */
   </audio>
 
   <button class="curved-button" id="fullscreenButton" title="Toggle Fullscreen">⛶</button>
-  <button class="back-home-button" id="backHomeBtn" title="Back to Dashboard" onclick="window.location.href='./index.html'">✖</button>
+  <button class="back-home-button" id="backHomeBtn" title="Back to Dashboard">✖</button>
   <header class="page-header">
   <h1 class="hero">HERO SELECTION</h1>
   <div id="search-link">
@@ -705,7 +705,7 @@ main.content {/* pushes footer down */
     const backBtn = document.getElementById("backHomeBtn");
 
     backBtn.addEventListener("click", () => {
-      window.location.href = "./index.html"; 
+      window.location.href = "./"; 
     });
     const heroes = [
       { name: "Toshinori Yagi", color: "#ffd700", glow: "#ffd500", desc: "The Symbol of Peace — an everlasting legend and beacon of hope.", video: "./Static/all_might_gid.mp4", quiz: "./Quizzes/allmight.html", image: "./Static/toshinori_yagi.jpg" },
