@@ -165,6 +165,15 @@
           <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
         </div>
       </div>
+ 
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--accent);">0/10</h1>
+        <p id="remarkText" style="margin-bottom: 25px; color: var(--secondary); font-style: italic;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; margin-top:20px; background: var(--primary); border: none;" onclick="location.reload()">RE-INITIALIZE SCAN</button>
+      </div>
+    </div>
+  </div>
 <footer class="site-footer">
   <div class="footer-container">
     <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
@@ -174,16 +183,7 @@
       <a href="./index.html">Back to Dashboard</a>
     </p>
   </div>
-</footer> 
-      <div id="results-area" style="display:none;">
-        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--accent);">0/10</h1>
-        <p id="remarkText" style="margin-bottom: 25px; color: var(--secondary); font-style: italic;"></p>
-        <div class="review-area" id="reviewList"></div>
-        <button class="option-btn" style="width:100%; margin-top:20px; background: var(--primary); border: none;" onclick="location.reload()">RE-INITIALIZE SCAN</button>
-      </div>
-    </div>
-  </div>
-
+</footer>
   <script>
     const audio = document.getElementById("myAudio");
     document.getElementById("start-btn").addEventListener("click", () => {

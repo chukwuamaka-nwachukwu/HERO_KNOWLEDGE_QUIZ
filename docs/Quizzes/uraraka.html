@@ -160,6 +160,15 @@
           <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
         </div>
       </div>
+
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 65px; margin: 0; color: var(--primary);">0</h1>
+        <p id="remarkText" style="font-weight: 700; color: #888;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="nav-btn" style="width:100%;" onclick="location.reload()">RE-ATTEMPT TRIAL</button>
+      </div>
+    </div>
+  </div>
 <footer class="site-footer">
   <div class="footer-container">
     <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
@@ -170,15 +179,6 @@
     </p>
   </div>
 </footer> 
-      <div id="results-area" style="display:none;">
-        <h1 id="scoreDisplay" style="font-size: 65px; margin: 0; color: var(--primary);">0</h1>
-        <p id="remarkText" style="font-weight: 700; color: #888;"></p>
-        <div class="review-area" id="reviewList"></div>
-        <button class="nav-btn" style="width:100%;" onclick="location.reload()">RE-ATTEMPT TRIAL</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     const audio = document.getElementById("myAudio");
     

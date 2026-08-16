@@ -171,6 +171,15 @@
           <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
         </div>
       </div>
+
+      <div id="results-area" style="display:none;">
+        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--primary); text-shadow: 0 0 20px var(--primary);">0/10</h1>
+        <p id="remarkText" style="font-weight: bold; margin-bottom: 20px;"></p>
+        <div class="review-area" id="reviewList"></div>
+        <button class="option-btn" style="width:100%; margin-top:20px; background: var(--primary); color: white;" onclick="location.reload()">RE-ATTEMPT (FOR THE SQUAD)</button>
+      </div>
+    </div>
+  </div>
 <footer class="site-footer">
   <div class="footer-container">
     <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
@@ -181,15 +190,6 @@
     </p>
   </div>
 </footer> 
-      <div id="results-area" style="display:none;">
-        <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--primary); text-shadow: 0 0 20px var(--primary);">0/10</h1>
-        <p id="remarkText" style="font-weight: bold; margin-bottom: 20px;"></p>
-        <div class="review-area" id="reviewList"></div>
-        <button class="option-btn" style="width:100%; margin-top:20px; background: var(--primary); color: white;" onclick="location.reload()">RE-ATTEMPT (FOR THE SQUAD)</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     const startScreen = document.getElementById("start-screen");
     const startBtn = document.getElementById("start-btn");

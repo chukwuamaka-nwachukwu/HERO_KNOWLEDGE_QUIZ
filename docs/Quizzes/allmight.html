@@ -91,45 +91,7 @@
     #start-btn:hover { background: var(--primary); color: black; box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
 
     .review-area { max-height: 200px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px solid #222; }
- .site-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0; /* ensure it spans full width */
-  width: 100%;
-  background: rgba(0,0,0,0.85);
-  color: #ccc;
-  text-align: center; /* center text */
-  padding: 12px 0;
-  font-size: 14px;
-  z-index: 20;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.4);
-}
-
-.site-footer .footer-container {
-  width: 100%; /* let it span full width */
-  margin: 0 auto;
-}
-
-.site-footer p {
-  margin: 4px 0;
-}
-
-.footer-links {
-  display: inline-block; /* keeps links centered under text */
-}
-
-.footer-links a {
-  color: #38bdf8;
-  text-decoration: none;
-  margin: 0 8px;
-  transition: color 0.3s ease;
-}
-
-.footer-links a:hover {
-  color: #00ffaa;
-}
-
+ 
   </style>
 </head>
 <body>
@@ -170,16 +132,7 @@
           <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
         </div>
       </div>
-<footer class="site-footer">
-  <div class="footer-container">
-    <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
-    <p class="footer-links">
-      <a href="https://github.com/chukwuamaka-nwachukwu" target="_blank">GitHub</a> |
-      <a href="mailto:your.chukwuamaka.nwachukwu.gmail.com">Contact</a> |
-      <a href="./index.html">Back to Dashboard</a>
-    </p>
-  </div>
-</footer> 
+
       <div id="results-area" style="display:none;">
         <h1 id="scoreDisplay" style="font-size: 60px; margin: 0; color: var(--primary);">0/10</h1>
         <p id="remarkText" style="font-weight: bold; margin-bottom: 20px;"></p>

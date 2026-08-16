@@ -169,6 +169,15 @@
           <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">NEXT</button>
         </div>
       </div>
+
+      <div id="results-area" style="display:none; text-align: center;">
+        <h1 id="scoreDisplay" style="font-size: 90px; margin: 0; color: var(--accent);">0/10</h1>
+        <p style="letter-spacing: 4px; font-weight: bold; color: var(--danger);" id="remarkText">ANALYZING PERFORMANCE...</p>
+        <div id="reviewList" class="review-area"></div>
+        <button class="nav-btn" style="width:100%; margin-top:20px; clip-path: none;" onclick="location.reload()">RE-ATTEMPT EXAM</button>
+      </div>
+    </div>
+  </div>
 <footer class="site-footer">
   <div class="footer-container">
     <p>&copy; 2026 Chukwuamaka Nwachukwu | My Hero Academia Quiz</p>
@@ -179,15 +188,6 @@
     </p>
   </div>
 </footer> 
-      <div id="results-area" style="display:none; text-align: center;">
-        <h1 id="scoreDisplay" style="font-size: 90px; margin: 0; color: var(--accent);">0/10</h1>
-        <p style="letter-spacing: 4px; font-weight: bold; color: var(--danger);" id="remarkText">ANALYZING PERFORMANCE...</p>
-        <div id="reviewList" class="review-area"></div>
-        <button class="nav-btn" style="width:100%; margin-top:20px; clip-path: none;" onclick="location.reload()">RE-ATTEMPT EXAM</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     const audio = document.getElementById("myAudio");
     document.getElementById("start-btn").addEventListener("click", () => {
