@@ -143,6 +143,129 @@
     #start-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(231, 76, 60, 0.4); }
 
     .review-area { max-height: 200px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid #222; }
+  /* Tablet responsiveness */
+@media (max-width: 1024px) {
+  .quiz-card {
+    max-width: 500px;
+    padding: 30px;
+  }
+  #questionText {
+    font-size: 20px;
+  }
+  .option-btn {
+    font-size: 14px;
+    padding: 14px;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .nav-container {
+    top: 15px;
+    padding: 0 15px;
+  }
+  .circle-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+
+  .quiz-card {
+    width: 95%;
+    max-width: 360px;
+    padding: 20px;
+  }
+
+  #questionText {
+    font-size: 18px;
+    line-height: 1.4;
+    margin: 10px 0;
+    text-align: center;
+  }
+
+  .options-grid {
+    grid-template-columns: 1fr; /* stack options vertically */
+    gap: 10px;
+    margin: 20px 0;
+  }
+
+  .option-btn {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 15px;
+  }
+
+  .nav-btn {
+    font-size: 13px;
+    padding: 8px 16px;
+  }
+
+  .lifeline-btn {
+    font-size: 10px;
+    padding: 6px 12px;
+  }
+
+  #start-screen h1 {
+    font-size: 2rem;
+    letter-spacing: 4px;
+    text-align: center;
+  }
+  #start-screen button {
+    padding: 12px 30px;
+    font-size: 14px;
+  }
+
+  .site-footer {
+    font-size: 12px;
+    padding: 8px 0;
+  }
+}
+
+/* Extra small phones */
+@media (max-width: 480px) {
+  .quiz-card {
+    max-width: 300px;
+    padding: 15px;
+  }
+
+  #questionText {
+    font-size: 16px;
+  }
+
+  .option-btn {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .controls {
+    gap: 10px;
+  }
+
+  .nav-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  #start-screen h1 {
+    font-size: 1.6rem;
+    letter-spacing: 2px;
+  }
+  #start-screen button {
+    padding: 10px 25px;
+    font-size: 13px;
+  }
+
+  .site-footer {
+    font-size: 11px;
+    padding: 6px 0;
+  }
+}
   </style>
 </head>
 <body>
